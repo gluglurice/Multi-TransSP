@@ -33,6 +33,3 @@ mha_files_path = '/*-cropped.mha'
 train_test_ratio = 5    # a number dividing the dataset by
 k = 5                   # KFold k
 seed = 2022             # seed of random.shuffle to guarantee the same dataset
-
-"""Log."""
-logger_name = f'log/log_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}.log'

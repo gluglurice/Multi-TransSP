@@ -4,8 +4,11 @@ train the Model for predicting survival.
 
 Author: Han
 """
+import os
 import glob
+import time
 
+import numpy as np
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
@@ -59,11 +62,19 @@ def train():
             opt_model, lr_lambda=LambdaLR(mc.epoch_total, mc.epoch_start, mc.epoch_decay).step)
 
         """(3) Start training."""
+
+        summary_path = f'./summary_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}'
+        if not os.path.exists(summary_path):
+            os.makedirs(summary_path)
+        summary_writer_train = SummaryWriter(summary_path + '/train')
+        summary_writer_eval = SummaryWriter(summary_path + '/eval')
+
         for epoch in range(mc.epoch_start, mc.epoch_total):
 
             """Train."""
             model.train()
             train_tqdm = tqdm(train_loader)
+            loss_history = []
             for i, batch in enumerate(train_tqdm):
                 """Data."""
                 image3D = batch['image3D']
@@ -84,6 +95,13 @@ def train():
                 """tqdm postfix."""
                 train_tqdm.set_description(f'epoch {epoch}')
                 train_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
+                loss_history.append(np.array(loss_survivals))
+
+            loss_history = np.array(loss_history)
+            summary_writer_train.add_scalar('Epoch Loss OS', loss_history.mean(axis=0).squeeze()[0])
+            summary_writer_train.add_scalar('Epoch Loss MFS', loss_history.mean(axis=0).squeeze()[1])
+            summary_writer_train.add_scalar('Epoch Loss RFS', loss_history.mean(axis=0).squeeze()[2])
+            summary_writer_train.add_scalar('Epoch Loss PFS', loss_history.mean(axis=0).squeeze()[3])
 
             lr_scheduler_model.step()
 
@@ -95,6 +113,7 @@ def train():
             with torch.no_grad():
                 model.eval()
                 validate_tqdm = tqdm(validate_loader)
+                loss_history = []
                 for i, batch in enumerate(validate_tqdm):
                     """Data."""
                     image3D = batch['image3D']
@@ -107,6 +126,16 @@ def train():
 
                     """Loss & Optimize."""
                     loss_survivals = criterion_MSE(predicted_survivals, label_survivals)
+
+                    train_tqdm.set_description(f'epoch {epoch}')
+                    train_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
+                    loss_history.append(np.array(loss_survivals))
+
+                loss_history = np.array(loss_history)
+                summary_writer_eval.add_scalar('Epoch Loss OS', loss_history.mean(axis=0).squeeze()[0])
+                summary_writer_eval.add_scalar('Epoch Loss MFS', loss_history.mean(axis=0).squeeze()[1])
+                summary_writer_eval.add_scalar('Epoch Loss RFS', loss_history.mean(axis=0).squeeze()[2])
+                summary_writer_eval.add_scalar('Epoch Loss PFS', loss_history.mean(axis=0).squeeze()[3])
 
 
 if __name__ == '__main__':

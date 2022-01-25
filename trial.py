@@ -17,7 +17,12 @@ def trial():
     """
     Trial.
     """
-    print(-1 % 20)
+    a = torch.tensor([[1, 2, 3, 4]])
+    b = torch.tensor([[3, 4, 5, 6]])
+    l = [np.array(a), np.array(b)]
+    l = np.array(l)
+    avg_loss = l.mean(axis=0)
+    print(avg_loss.squeeze())
 
 
 def main():

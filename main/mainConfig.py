@@ -40,6 +40,3 @@ conv_1_1_channel = 2048 + 12
 sequence_length = 256
 dimension = 11 * 11
 survivals_len = 4
-
-"""Log."""
-logger_name = f'log/log_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}.log'
