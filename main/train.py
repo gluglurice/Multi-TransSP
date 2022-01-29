@@ -23,6 +23,13 @@ from utils import LambdaLR
 
 def train():
     """KFold training."""
+
+    summary_path = f'./summary_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}'
+    if not os.path.exists(summary_path):
+        os.makedirs(summary_path)
+    summary_writer_train = SummaryWriter(summary_path + '/train')
+    summary_writer_eval = SummaryWriter(summary_path + '/eval')
+
     for ki in range(1, mc.k+1):
 
         print(f'Fold {ki}/{mc.k}:')
@@ -62,13 +69,6 @@ def train():
             opt_model, lr_lambda=LambdaLR(mc.epoch_total, mc.epoch_start, mc.epoch_decay).step)
 
         """(3) Start training."""
-
-        summary_path = f'./summary_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}'
-        if not os.path.exists(summary_path):
-            os.makedirs(summary_path)
-        summary_writer_train = SummaryWriter(summary_path + '/train')
-        summary_writer_eval = SummaryWriter(summary_path + '/eval')
-
         for epoch in range(mc.epoch_start + (ki-1) * mc.epoch_total, ki * mc.epoch_total):
 
             """Train."""
