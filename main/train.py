@@ -69,7 +69,7 @@ def train():
         summary_writer_train = SummaryWriter(summary_path + '/train')
         summary_writer_eval = SummaryWriter(summary_path + '/eval')
 
-        for epoch in range(mc.epoch_start, mc.epoch_total):
+        for epoch in range(mc.epoch_start + (ki-1) * mc.epoch_total, ki * mc.epoch_total):
 
             """Train."""
             model.train()
