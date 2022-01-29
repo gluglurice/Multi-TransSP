@@ -50,7 +50,7 @@ class Model(nn.Module):
         if image3D is not None:
             text_feature = None
             """For each image piece of this patient."""
-            for image in tqdm(image3D[0]):
+            for image in image3D[0]:
                 x_list = []
                 image = image.unsqueeze(0).unsqueeze(0)
                 image_feature = self.image_encoder(image)
@@ -70,7 +70,7 @@ class Model(nn.Module):
 
             """Supplement zeros to adapt to max_valid_slice_num,
             and return the 4 survivals."""
-            zeros = torch.zeros([1, self.max_valid_slice_num - len(survival_list)], dtype=torch.float32)
+            zeros = torch.zeros([1, self.max_valid_slice_num - len(survival_list)], dtype=torch.float32).to(mc.device)
             survival_list.append(zeros)
             survivals = torch.cat(survival_list, 1)
             survivals = self.fc_survivals(survivals)

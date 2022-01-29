@@ -5,10 +5,10 @@ Author: Han
 """
 import time
 
-from PIL import Image
 from torch import device, cuda
 from torchvision import transforms
 from openpyxl.utils import column_index_from_string
+from torchvision.transforms.functional import InterpolationMode
 
 """Excel-related variables."""
 excel_path = './dataset/clinical.xlsx'
@@ -33,7 +33,7 @@ mha_files_path = '/*-cropped.mha'
 """Dataset"""
 device = device('cuda' if cuda.is_available() else 'cpu')
 transforms_train = transforms.Compose([
-    transforms.Resize(int(332 * 1.12), Image.BICUBIC),
+    transforms.Resize(int(332 * 1.12), InterpolationMode.BICUBIC),
     transforms.RandomCrop(332),
     transforms.RandomHorizontalFlip(),
     transforms.Normalize((0.5,), (0.5,))
