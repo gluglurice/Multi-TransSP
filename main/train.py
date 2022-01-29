@@ -104,7 +104,7 @@ def train():
 
             """Save model."""
             if ((epoch - mc.epoch_start - 19) % 20 == 0) or (epoch == mc.epoch_total - 1):
-                torch.save(model.state_dict(), f'./model/model_epoch_{epoch + 1}.pth')
+                torch.save(model.state_dict(), f'../model/model_epoch_{epoch + 1}.pth')
 
             """Validate."""
             with torch.no_grad():
@@ -124,9 +124,9 @@ def train():
                     """Loss & Optimize."""
                     loss_survivals = criterion_MSE(predicted_survivals, label_survivals).to(mc.device)
 
-                    train_tqdm.set_description(f'epoch {epoch}')
-                    train_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
-                    loss_history.append(np.array(loss_survivals))
+                    validate_tqdm.set_description(f'epoch {epoch}')
+                    validate_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
+                    loss_history.append(np.array(loss_survivals.detach().cpu()))
 
                 loss_history = np.array(loss_history)
                 summary_writer_eval.add_scalar('Epoch Loss OS', loss_history.mean(axis=0))
