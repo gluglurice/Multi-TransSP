@@ -24,7 +24,7 @@ transforms_test = transforms.Compose([
     transforms.Normalize((0.5,), (0.5,))
 ])
 k = 5                   # KFold k
-num_workers = 2         # num_workers of data loader
+num_workers = 1         # num_workers of data loader
 text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd dimension as its length
 
 """(2) Network"""

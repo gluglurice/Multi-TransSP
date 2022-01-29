@@ -63,11 +63,11 @@ def train():
 
         """(3) Start training."""
 
-        summary_path = f'./summary_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}'
-        if not os.path.exists(summary_path):
-            os.makedirs(summary_path)
-        summary_writer_train = SummaryWriter(summary_path + '/train')
-        summary_writer_eval = SummaryWriter(summary_path + '/eval')
+        # summary_path = f'./summary_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}'
+        # if not os.path.exists(summary_path):
+        #     os.makedirs(summary_path)
+        # summary_writer_train = SummaryWriter(summary_path + '/train')
+        # summary_writer_eval = SummaryWriter(summary_path + '/eval')
 
         for epoch in range(mc.epoch_start, mc.epoch_total):
 
@@ -77,10 +77,10 @@ def train():
             loss_history = []
             for i, batch in enumerate(train_tqdm):
                 """Data."""
-                image3D = batch['image3D']
-                text = batch['text']
-                label_survivals = batch['survivals']
-                mask = torch.ones([1, mc.sequence_length]).bool()
+                image3D = batch['image3D'].to(mc.device)
+                text = batch['text'].to(mc.device)
+                label_survivals = batch['survivals'].to(mc.device)
+                mask = torch.ones([1, mc.sequence_length]).bool().to(mc.device)
 
                 """Predict."""
                 predicted_survivals = model(image3D=image3D, text=text, mask=mask)
@@ -109,33 +109,33 @@ def train():
             if ((epoch - mc.epoch_start - 19) % 20 == 0) or (epoch == mc.epoch_total - 1):
                 torch.save(model.state_dict(), f'./model/model_epoch_{epoch + 1}.pth')
 
-            """Validate."""
-            with torch.no_grad():
-                model.eval()
-                validate_tqdm = tqdm(validate_loader)
-                loss_history = []
-                for i, batch in enumerate(validate_tqdm):
-                    """Data."""
-                    image3D = batch['image3D']
-                    text = batch['text']
-                    label_survivals = batch['survivals']
-                    mask = torch.ones([1, mc.sequence_length]).bool()
-
-                    """Predict."""
-                    predicted_survivals = model(image3D=image3D, text=text, mask=mask)
-
-                    """Loss & Optimize."""
-                    loss_survivals = criterion_MSE(predicted_survivals, label_survivals)
-
-                    train_tqdm.set_description(f'epoch {epoch}')
-                    train_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
-                    loss_history.append(np.array(loss_survivals))
-
-                loss_history = np.array(loss_history)
-                summary_writer_eval.add_scalar('Epoch Loss OS', loss_history.mean(axis=0).squeeze()[0])
-                summary_writer_eval.add_scalar('Epoch Loss MFS', loss_history.mean(axis=0).squeeze()[1])
-                summary_writer_eval.add_scalar('Epoch Loss RFS', loss_history.mean(axis=0).squeeze()[2])
-                summary_writer_eval.add_scalar('Epoch Loss PFS', loss_history.mean(axis=0).squeeze()[3])
+            # """Validate."""
+            # with torch.no_grad():
+            #     model.eval()
+            #     validate_tqdm = tqdm(validate_loader)
+            #     loss_history = []
+            #     for i, batch in enumerate(validate_tqdm):
+            #         """Data."""
+            #         image3D = batch['image3D'].to(mc.device)
+            #         text = batch['text'].to(mc.device)
+            #         label_survivals = batch['survivals'].to(mc.device)
+            #         mask = torch.ones([1, mc.sequence_length]).bool().to(mc.device)
+            #
+            #         """Predict."""
+            #         predicted_survivals = model(image3D=image3D, text=text, mask=mask)
+            #
+            #         """Loss & Optimize."""
+            #         loss_survivals = criterion_MSE(predicted_survivals, label_survivals)
+            #
+            #         train_tqdm.set_description(f'epoch {epoch}')
+            #         train_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
+            #         loss_history.append(np.array(loss_survivals))
+            #
+            #     loss_history = np.array(loss_history)
+            #     summary_writer_eval.add_scalar('Epoch Loss OS', loss_history.mean(axis=0).squeeze()[0])
+            #     summary_writer_eval.add_scalar('Epoch Loss MFS', loss_history.mean(axis=0).squeeze()[1])
+            #     summary_writer_eval.add_scalar('Epoch Loss RFS', loss_history.mean(axis=0).squeeze()[2])
+            #     summary_writer_eval.add_scalar('Epoch Loss PFS', loss_history.mean(axis=0).squeeze()[3])
 
 
 if __name__ == '__main__':

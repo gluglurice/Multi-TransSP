@@ -17,12 +17,12 @@ def trial():
     """
     Trial.
     """
-    a = torch.tensor([[1, 2, 3, 4]])
-    b = torch.tensor([[3, 4, 5, 6]])
-    l = [np.array(a), np.array(b)]
-    l = np.array(l)
-    avg_loss = l.mean(axis=0)
-    print(avg_loss.squeeze())
+    train_set = MyDataset(root=c.data_path, excel_path=c.excel_path, mode='train',
+                          ki=1, k=c.k, transform=c.transforms_train, rand=True)
+    validate_set = MyDataset(root=c.data_path, excel_path=c.excel_path, mode='validate',
+                             ki=1, k=c.k, transform=c.transforms_train, rand=True)
+
+    print(len(train_set))
 
 
 def main():
