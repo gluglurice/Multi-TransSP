@@ -83,7 +83,7 @@ def train():
                 mask = torch.ones([1, mc.sequence_length]).bool().to(mc.device)
 
                 """Predict."""
-                predicted_survivals = model(image3D=image3D, text=text, mask=mask)
+                predicted_survivals = model(image3D=image3D, text=text, mask=mask).to(mc.device)
 
                 """Loss & Optimize."""
                 loss_survivals = criterion_MSE(predicted_survivals, label_survivals).to(mc.device)
@@ -119,7 +119,7 @@ def train():
                     mask = torch.ones([1, mc.sequence_length]).bool().to(mc.device)
 
                     """Predict."""
-                    predicted_survivals = model(image3D=image3D, text=text, mask=mask)
+                    predicted_survivals = model(image3D=image3D, text=text, mask=mask).to(mc.device)
 
                     """Loss & Optimize."""
                     loss_survivals = criterion_MSE(predicted_survivals, label_survivals).to(mc.device)
