@@ -57,8 +57,9 @@ def train():
             model.load_state_dict(torch.load(model_path, map_location=mc.device))
             """Continue the epoch number."""
             epoch_base = int(model_path.split('_')[-1].split('.')[0])
-            mc.epoch_start += epoch_base
-            mc.epoch_total += epoch_base
+            mc.epoch_start = epoch_base
+            mc.epoch_total = epoch_base + mc.epoch_interval
+            mc.epoch_decay = mc.epoch_start + mc.epoch_interval // 2
 
         """Loss & Optimize."""
         criterion_MSE = nn.MSELoss()
@@ -69,7 +70,7 @@ def train():
             opt_model, lr_lambda=LambdaLR(mc.epoch_total, mc.epoch_start, mc.epoch_decay).step)
 
         """(3) Start training."""
-        for epoch in range(mc.epoch_start + (ki-1) * mc.epoch_total, ki * mc.epoch_total):
+        for epoch in range(mc.epoch_start, mc.epoch_total):
 
             """Train."""
             model.train()
