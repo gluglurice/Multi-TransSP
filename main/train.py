@@ -30,9 +30,9 @@ def train():
     summary_writer_train = SummaryWriter(summary_path + '/train')
     summary_writer_eval = SummaryWriter(summary_path + '/eval')
 
-    for ki in range(1, mc.k+1):
+    for ki in range(0, mc.k):
 
-        print(f'Fold {ki}/{mc.k}:')
+        print(f'Fold {ki+1}/{mc.k}:')
 
         """(1) Prepare data."""
         train_set = MyDataset(root=mc.data_path, excel_path=mc.excel_path, mode='train',

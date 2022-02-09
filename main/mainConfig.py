@@ -5,9 +5,10 @@ Author: Han
 """
 import time
 
+from PIL import Image
+
 from torch import device, cuda
 from torchvision import transforms
-from torchvision.transforms.functional import InterpolationMode
 
 
 """(1) Dataloader"""
@@ -15,7 +16,7 @@ excel_path = '../dataset/clinical.xlsx'
 data_path = '../dataset/mha'
 device = device('cuda' if cuda.is_available() else 'cpu')
 transforms_train = transforms.Compose([
-    transforms.Resize(int(332 * 1.12), InterpolationMode.BICUBIC),
+    transforms.Resize(int(332 * 1.12), Image.BICUBIC),
     transforms.RandomCrop(332),
     transforms.RandomHorizontalFlip(),
     transforms.Normalize((0.5,), (0.5,))

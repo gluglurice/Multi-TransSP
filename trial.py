@@ -18,11 +18,11 @@ def trial():
     Trial.
     """
     train_set = MyDataset(root=c.data_path, excel_path=c.excel_path, mode='train',
-                          ki=1, k=c.k, transform=c.transforms_train, rand=True)
+                          ki=4, k=c.k, transform=c.transforms_train, rand=True)
     validate_set = MyDataset(root=c.data_path, excel_path=c.excel_path, mode='validate',
-                             ki=1, k=c.k, transform=c.transforms_train, rand=True)
+                             ki=4, k=c.k, transform=c.transforms_train, rand=True)
 
-    print(len(train_set))
+    print(len(train_set), len(validate_set))
 
 
 def main():
