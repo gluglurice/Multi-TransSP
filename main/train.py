@@ -66,8 +66,8 @@ def train():
 
         opt_model = torch.optim.Adam(model.parameters(), lr=mc.lr, betas=(0.9, 0.9999))
 
-        lr_scheduler_model = torch.optim.lr_scheduler.LambdaLR(
-            opt_model, lr_lambda=LambdaLR(mc.epoch_total, mc.epoch_start, mc.epoch_decay).step)
+        # lr_scheduler_model = torch.optim.lr_scheduler.LambdaLR(
+        #     opt_model, lr_lambda=LambdaLR(mc.epoch_total, mc.epoch_start, mc.epoch_decay).step)
 
         """(3) Start training."""
         for epoch in range(mc.epoch_start, mc.epoch_total):
@@ -99,9 +99,9 @@ def train():
                 loss_history.append(np.array(loss_survivals.detach().cpu()))
 
             loss_history = np.array(loss_history)
-            summary_writer_train.add_scalar('Epoch Loss OS', loss_history.mean(axis=0))
+            summary_writer_train.add_scalar('Epoch Loss', loss_history.mean(axis=0), epoch)
 
-            lr_scheduler_model.step()
+            # lr_scheduler_model.step()
 
             """Save model."""
             if ((epoch - mc.epoch_start - 19) % 20 == 0) or (epoch == mc.epoch_total - 1):
@@ -130,7 +130,7 @@ def train():
                     loss_history.append(np.array(loss_survivals.detach().cpu()))
 
                 loss_history = np.array(loss_history)
-                summary_writer_eval.add_scalar('Epoch Loss OS', loss_history.mean(axis=0))
+                summary_writer_eval.add_scalar('Epoch Loss', loss_history.mean(axis=0), epoch)
 
 
 if __name__ == '__main__':
