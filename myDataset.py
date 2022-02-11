@@ -66,16 +66,16 @@ class MyDataset(Dataset):
         row = self.row_list[index]
 
         text_list = []
-        for i in range(c.col_feature_start, c.col_feature_end + 1):
+        for i in range(c.col_feature_start - 1, c.col_feature_end):
             text_list.append(row[i].value)
         text = torch.tensor(text_list, dtype=torch.float)
 
         survival_list = []
-        for i in range(c.col_label_start, c.col_label_end + 1):
+        for i in range(c.col_label_start - 1, c.col_label_end):
             survival_list.append(row[i].value)
         survivals = torch.tensor(survival_list, dtype=torch.float)
 
-        return {'image3D': image3D, 'text': text, 'survivals': survivals}
+        return {'mha': mha, 'image3D': image3D, 'text': text, 'survivals': survivals}
 
     def get_mha_list(self):
         """
@@ -116,10 +116,18 @@ class MyDataset(Dataset):
         row_list = []
         wb = load_workbook(self.excel_path)
         ws = wb[wb.sheetnames[0]]
+        for col in ws.iter_cols(min_col=c.col_feature_start, max_col=c.col_label_end):
+            col_data = []
+            for i in range(1, ws.max_row):
+                col_data.append(col[i].value)
+            min_value = min(col_data)
+            max_value = max(col_data)
+            for i in range(1, ws.max_row):
+                col[i].value = (col[i].value - min_value) / (max_value - min_value)
         for mha in self.mha_list:
             patient_id = int(mha.split('-')[1].split('.')[0])
             for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
-                if patient_id == row[c.col_id].value:
+                if patient_id == row[c.col_id - 1].value:
                     row_list.append(row)
                     break
         return row_list
@@ -131,6 +139,6 @@ class MyDataset(Dataset):
         """
         max_valid_slice_num = 0
         for row in self.row_list:
-            if row[c.col_total_layer].value > max_valid_slice_num:
-                max_valid_slice_num = row[c.col_total_layer].value
+            if row[c.col_total_layer - 1].value > max_valid_slice_num:
+                max_valid_slice_num = row[c.col_total_layer - 1].value
         return max_valid_slice_num
