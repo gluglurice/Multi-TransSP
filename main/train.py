@@ -58,19 +58,18 @@ def train():
             """Continue the epoch number."""
             epoch_base = int(model_path.split('_')[-1].split('.')[0])
             mc.epoch_start = epoch_base
-            mc.epoch_total = epoch_base + mc.epoch_interval
-            mc.epoch_decay = mc.epoch_start + mc.epoch_interval // 2
+            mc.epoch_end = epoch_base + mc.epoch_interval
 
         """Loss & Optimize."""
         criterion_MSE = nn.MSELoss()
 
         opt_model = torch.optim.Adam(model.parameters(), lr=mc.lr, betas=(0.9, 0.9999))
 
-        # lr_scheduler_model = torch.optim.lr_scheduler.LambdaLR(
-        #     opt_model, lr_lambda=LambdaLR(mc.epoch_total, mc.epoch_start, mc.epoch_decay).step)
+        lr_scheduler_model = torch.optim.lr_scheduler.LambdaLR(
+            opt_model, lr_lambda=LambdaLR(mc.epoch_total, 0, mc.epoch_decay).step)
 
         """(3) Start training."""
-        for epoch in range(mc.epoch_start, mc.epoch_total):
+        for epoch in range(mc.epoch_start, mc.epoch_end):
 
             """Train."""
             model.train()
@@ -101,7 +100,7 @@ def train():
             loss_history = np.array(loss_history)
             summary_writer_train.add_scalar('Epoch Loss', loss_history.mean(axis=0), epoch)
 
-            # lr_scheduler_model.step()
+            lr_scheduler_model.step()
 
             """Save model."""
             if ((epoch - mc.epoch_start - 19) % 20 == 0) or (epoch == mc.epoch_total - 1):
