@@ -32,11 +32,11 @@ class Model(nn.Module):
         self.flatten = nn.Flatten(start_dim=2, end_dim=-1)
         self.fc_fastformer = nn.Sequential(*[
             nn.Linear(mc.sequence_length, 1),
-            nn.ReLU()
+            nn.Sigmoid()
         ])
         self.fc_survivals = nn.Sequential(*[
             nn.Linear(max_valid_slice_num, mc.survivals_len),
-            nn.ReLU()
+            nn.Sigmoid()
         ])
 
     def forward(self, image3D=None, text=None, mask=None):
