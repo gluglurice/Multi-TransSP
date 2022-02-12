@@ -1,6 +1,6 @@
 """
 This file aims to
-train the Model for predicting survival.
+train the model for predicting survival.
 
 Author: Han
 """
@@ -103,7 +103,7 @@ def train():
             lr_scheduler_model.step()
 
             """Save model."""
-            if ((epoch - mc.epoch_start - 19) % 20 == 0) or (epoch == mc.epoch_total - 1):
+            if ((epoch - mc.epoch_start - 19) % 20 == 0) or (epoch == mc.epoch_end - 1):
                 torch.save(model.state_dict(), f'../model/model_epoch_{epoch + 1}.pth')
 
             """Validate."""

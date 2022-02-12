@@ -16,7 +16,7 @@ excel_path = './dataset/clinical.xlsx'
 
 col_id = column_index_from_string('B')
 
-col_total_layer = column_index_from_string('F')
+col_valid_layer = column_index_from_string('F')
 
 col_feature_start = column_index_from_string('I')
 col_feature_end = column_index_from_string('T')

@@ -138,7 +138,9 @@ class MyDataset(Dataset):
             max_valid_slice_num: the max total layer of all the patients
         """
         max_valid_slice_num = 0
-        for row in self.row_list:
-            if row[c.col_total_layer - 1].value > max_valid_slice_num:
-                max_valid_slice_num = row[c.col_total_layer - 1].value
+        wb = load_workbook(self.excel_path)
+        ws = wb[wb.sheetnames[0]]
+        for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+            if row[c.col_valid_layer - 1].value > max_valid_slice_num:
+                max_valid_slice_num = row[c.col_valid_layer - 1].value
         return max_valid_slice_num

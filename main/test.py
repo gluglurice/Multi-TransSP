@@ -1,6 +1,6 @@
 """
 This file aims to
-test the ResNet50 for predicting survival.
+test the model for predicting survival.
 
 Author: Han
 """

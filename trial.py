@@ -17,10 +17,11 @@ def trial():
     """
     Trial.
     """
-    train_set = MyDataset(root=c.data_path, excel_path=c.excel_path, mode='train',
-                          ki=4, k=c.k, transform=c.transforms_train, rand=True)
-    data = train_set.__getitem__(0)
-    print(data)
+    train_set0 = MyDataset(root=c.data_path, excel_path=c.excel_path, mode='train',
+                           ki=0, k=c.k, transform=c.transforms_train, rand=True)
+    train_set1 = MyDataset(root=c.data_path, excel_path=c.excel_path, mode='train',
+                           ki=1, k=c.k, transform=c.transforms_train, rand=True)
+    print(train_set0.max_valid_slice_num, train_set1.max_valid_slice_num)
 
 
 def main():

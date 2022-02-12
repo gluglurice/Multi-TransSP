@@ -30,14 +30,9 @@ class Model(nn.Module):
         self.conv_1_1 = nn.Conv2d(mc.conv_1_1_channel, mc.sequence_length,
                                   kernel_size=(1, 1), stride=(1, 1), padding=(0, 0))
         self.flatten = nn.Flatten(start_dim=2, end_dim=-1)
-        self.fc_fastformer = nn.Sequential(*[
-            nn.Linear(mc.sequence_length, 1),
-            nn.Sigmoid()
-        ])
-        self.fc_survivals = nn.Sequential(*[
-            nn.Linear(max_valid_slice_num, mc.survivals_len),
-            nn.Sigmoid()
-        ])
+        self.fc_fastformer = nn.Linear(mc.sequence_length, 1)
+        self.fc_survivals = nn.Linear(max_valid_slice_num, mc.survivals_len)
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, image3D=None, text=None, mask=None):
         """
@@ -66,6 +61,7 @@ class Model(nn.Module):
                 x = self.flatten(x)
                 x = self.fastformer(x, mask=mask).squeeze(-1)
                 x = self.fc_fastformer(x)
+                x = self.sigmoid(x)
                 survival_list.append(x)
 
             """Supplement zeros to adapt to max_valid_slice_num,
@@ -74,6 +70,7 @@ class Model(nn.Module):
             survival_list.append(zeros)
             survivals = torch.cat(survival_list, 1)
             survivals = self.fc_survivals(survivals)
+            survivals = self.sigmoid(survivals)
             return survivals
 
         elif text is not None and image3D is None:
