@@ -93,17 +93,18 @@ class Model(nn.Module):
 
     def get_channel_num(self):
         """Get conv_1_1_channel and the dimension of the convolved feature map."""
-        resnet_encoder = self.image_encoder.to(mc.device)
-        image = torch.rand(1, 1, 332, 332, dtype=torch.float32).to(mc.device)
-        image_feature = resnet_encoder(image)
+        with torch.no_grad():
+            resnet_encoder = self.image_encoder.to(mc.device)
+            image = torch.rand(1, 1, 332, 332, dtype=torch.float32).to(mc.device)
+            image_feature = resnet_encoder(image)
 
-        dimension = image_feature.shape[2] * image_feature.shape[3]
+            dimension = image_feature.shape[2] * image_feature.shape[3]
 
-        conv_1_1_channel = image_feature.shape[1] + mc.text_len
-        if self.is_position is True:
-            conv_1_1_channel += self.max_valid_slice_num
+            conv_1_1_channel = image_feature.shape[1] + mc.text_len
+            if self.is_position is True:
+                conv_1_1_channel += self.max_valid_slice_num
 
-        return dimension, conv_1_1_channel
+            return dimension, conv_1_1_channel
 
 
 if __name__ == '__main__':
