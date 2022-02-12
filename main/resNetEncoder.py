@@ -1,3 +1,8 @@
+"""
+ResNetEncoder class in the model.
+
+Author: Han
+"""
 import glob
 
 import torch
@@ -34,3 +39,10 @@ class ResNetEncoder(nn.Module):
         x = self.model.layer4(x)
 
         return x
+
+
+if __name__ == '__main__':
+    resnet_encoder = ResNetEncoder().to(mc.device)
+    image = torch.rand(1, 1, 332, 332, dtype=torch.float32).to(mc.device)
+    image_feature = resnet_encoder(image)
+    print(image_feature.shape)

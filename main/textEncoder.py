@@ -1,10 +1,15 @@
+"""
+TextEncoder class in the model.
+
+Author: Han
+"""
 import torch
 import torch.nn as nn
 
 
 class TextEncoder(nn.Module):
     """
-    Linearly transforms_train text.
+    Linearly transforms text.
     """
     def __init__(self):
         super(TextEncoder, self).__init__()

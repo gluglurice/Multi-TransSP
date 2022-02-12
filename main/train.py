@@ -49,7 +49,7 @@ def train():
 
         """(2) Prepare Network."""
         """Model."""
-        model = Model(max_valid_slice_num).to(mc.device)
+        model = Model(max_valid_slice_num, is_position=mc.is_position).to(mc.device)
 
         if len(glob.glob(mc.model_path_reg)) > 0:
             model_path = sorted(glob.glob(mc.model_path_reg),

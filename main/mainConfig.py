@@ -31,6 +31,7 @@ text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd 
 """(2) Network"""
 model_resnet50_path = '../model/resnet50-19c8e357.pth'
 model_path_reg = '../model/model_epoch_*.pth'
+is_position = True
 batch_size = 1
 size = 332
 lr = 0.02
@@ -39,7 +40,6 @@ epoch_interval = 20
 epoch_end = epoch_start + epoch_interval
 epoch_total = 100
 epoch_decay = 80
-conv_1_1_channel = 2048 + 12
 sequence_length = 256
-dimension = 11 * 11
+text_len = 12
 survivals_len = 4
