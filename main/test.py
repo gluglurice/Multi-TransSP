@@ -21,7 +21,7 @@ import mainConfig as mc
 
 
 def test():
-    summary_path = f'./summary_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}'
+    summary_path = f'./summary_test_{time.strftime("%Y%m%d%H%M%S", time.localtime())}'
     if not os.path.exists(summary_path):
         os.makedirs(summary_path)
     summary_writer_test = SummaryWriter(summary_path + '/test')
@@ -49,6 +49,7 @@ def test():
     with torch.no_grad():
         model.eval()
         test_tqdm = tqdm(test_loader)
+        loss_history = []
         for i, batch in enumerate(test_tqdm):
             """Data."""
             image3D = batch['image3D'].to(mc.device)
@@ -64,7 +65,11 @@ def test():
 
             """tqdm postfix."""
             test_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
-            summary_writer_test.add_scalar('Loss', np.array(loss_survivals.detach().cpu()), i)
+            loss_survivals = np.array(loss_survivals.detach().cpu())
+            summary_writer_test.add_scalar('MSE Loss', loss_survivals, i)
+            loss_history.append(loss_survivals)
+
+        summary_writer_test.add_scalar('Mean MSE Loss', np.array(loss_history).mean(axis=0))
 
 
 if __name__ == '__main__':

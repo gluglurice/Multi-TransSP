@@ -27,9 +27,11 @@ num_workers = 1         # num_workers of data loader
 text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd dimension as its length
 
 """(2) Network"""
-model_resnet50_path = '../model/resnet50-19c8e357.pth'
-model_path_reg = '../model/model_epoch_*.pth'
+model_resnet50_path = './model/resnet50-19c8e357.pth'
+model_path_reg = './model/model_epoch_*.pth'
+is_text = True
 is_position = True
+is_fastformer = True
 batch_size = 1
 size = 332
 lr = 0.02

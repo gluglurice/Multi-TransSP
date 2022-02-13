@@ -24,7 +24,7 @@ from utils import LambdaLR
 def train():
     """KFold training."""
 
-    summary_path = f'./summary_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}'
+    summary_path = f'./summary_{time.strftime("%Y%m%d%H%M%S", time.localtime())}'
     if not os.path.exists(summary_path):
         os.makedirs(summary_path)
     summary_writer_train = SummaryWriter(summary_path + '/train')
@@ -49,7 +49,8 @@ def train():
 
         """(2) Prepare Network."""
         """Model."""
-        model = Model(max_valid_slice_num, is_position=mc.is_position).to(mc.device)
+        model = Model(max_valid_slice_num, is_text=mc.is_text, is_position=mc.is_position,
+                      is_fastformer=mc.is_fastformer).to(mc.device)
 
         if len(glob.glob(mc.model_path_reg)) > 0:
             model_path = sorted(glob.glob(mc.model_path_reg),
@@ -98,13 +99,13 @@ def train():
                 loss_history.append(np.array(loss_survivals.detach().cpu()))
 
             loss_history = np.array(loss_history)
-            summary_writer_train.add_scalar('Epoch Loss', loss_history.mean(axis=0), epoch)
+            summary_writer_train.add_scalar('Epoch MSE Loss', loss_history.mean(axis=0), epoch)
 
             lr_scheduler_model.step()
 
             """Save model."""
             if ((epoch - mc.epoch_start - 19) % 20 == 0) or (epoch == mc.epoch_end - 1):
-                torch.save(model.state_dict(), f'../model/model_epoch_{epoch + 1}.pth')
+                torch.save(model.state_dict(), f'./model/model_epoch_{epoch + 1}.pth')
 
             """Validate."""
             with torch.no_grad():
@@ -129,7 +130,7 @@ def train():
                     loss_history.append(np.array(loss_survivals.detach().cpu()))
 
                 loss_history = np.array(loss_history)
-                summary_writer_eval.add_scalar('Epoch Loss', loss_history.mean(axis=0), epoch)
+                summary_writer_eval.add_scalar('Epoch MSE Loss', loss_history.mean(axis=0), epoch)
 
 
 if __name__ == '__main__':

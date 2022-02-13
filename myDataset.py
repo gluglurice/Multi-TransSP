@@ -20,7 +20,7 @@ class MyDataset(Dataset):
     Load radiographs(mha(s) here) and clinical data(excel).
     """
 
-    def __init__(self, root, excel_path, mode='train', ki=1, k=1, transform=None, rand=False):
+    def __init__(self, root, excel_path, mode='train', ki=0, k=1, transform=None, rand=False):
         """
         Initialize the class.
         :param root: mha data root
