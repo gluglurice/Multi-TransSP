@@ -7,18 +7,18 @@ from openpyxl.utils import column_index_from_string
 
 excel_path = '../dataset/clinical.xlsx'
 
-col_id = column_index_from_string('B') - 1
+col_id = column_index_from_string('B')
 
-col_min_layer = column_index_from_string('D') - 1
-col_max_layer = column_index_from_string('E') - 1
-col_total_layer = column_index_from_string('F') - 1
+col_min_layer = column_index_from_string('D')
+col_max_layer = column_index_from_string('E')
+col_total_layer = column_index_from_string('F')
 
-col_stage = column_index_from_string('U') - 1
-col_stage_T = column_index_from_string('V') - 1
-col_stage_N = column_index_from_string('W') - 1
+col_stage = column_index_from_string('U')
+col_stage_T = column_index_from_string('V')
+col_stage_N = column_index_from_string('W')
 
-col_rt_days = column_index_from_string('M') - 1
-col_BMI = column_index_from_string('Q') - 1
+col_rt_days = column_index_from_string('M')
+col_BMI = column_index_from_string('Q')
 
 input_path = '../dataset/dicom'
 output_path = '../dataset/mha'
