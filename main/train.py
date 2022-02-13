@@ -93,7 +93,7 @@ def train():
                 opt_model.step()
 
                 """tqdm postfix."""
-                train_tqdm.set_description(f'epoch {epoch}')
+                train_tqdm.set_description(f'epoch {epoch} training')
                 train_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
                 loss_history.append(np.array(loss_survivals.detach().cpu()))
 
@@ -124,7 +124,7 @@ def train():
                     """Loss & Optimize."""
                     loss_survivals = criterion_MSE(predicted_survivals, label_survivals).to(mc.device)
 
-                    validate_tqdm.set_description(f'epoch {epoch}')
+                    validate_tqdm.set_description(f'epoch {epoch} validating')
                     validate_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
                     loss_history.append(np.array(loss_survivals.detach().cpu()))
 

@@ -60,12 +60,13 @@ class Model(nn.Module):
                     text_feature = self.text_encoder(text).unsqueeze(-1).unsqueeze(-1)
                     text_feature = text_feature.expand(text.shape[0], text.shape[1],
                                                        image_feature.shape[-2], image_feature.shape[-1])
-                x_list.append(text_feature)
+                if text_feature is not None:
+                    x_list.append(text_feature)
 
                 if self.is_position is True:
                     position = [0] * self.max_valid_slice_num
                     position[i] = 1
-                    position = torch.tensor(position, dtype=torch.float).unsqueeze(0)
+                    position = torch.tensor(position, dtype=torch.float).unsqueeze(0).to(mc.device)
                     """3D expand position feature"""
                     position_feature = position.unsqueeze(-1).unsqueeze(-1)
                     position_feature = position_feature.expand(position_feature.shape[0], position_feature.shape[1],

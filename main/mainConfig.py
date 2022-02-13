@@ -3,8 +3,6 @@ Some variables
 
 Author: Han
 """
-import time
-
 from PIL import Image
 
 from torch import device, cuda
