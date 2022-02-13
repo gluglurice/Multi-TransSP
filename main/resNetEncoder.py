@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 from torchvision import models
 
-import mainConfig as mc
+import main.mainConfig as mc
 
 
 class ResNetEncoder(nn.Module):

@@ -16,8 +16,8 @@ from tqdm import tqdm
 from tensorboardX import SummaryWriter
 
 from myDataset import MyDataset
-from model import Model
-import mainConfig as mc
+from main.model import Model
+import main.mainConfig as mc
 from utils import LambdaLR
 
 
@@ -75,7 +75,7 @@ def train():
             """Train."""
             model.train()
             train_tqdm = tqdm(train_loader)
-            loss_history = []
+            loss_train_history = []
             for i, batch in enumerate(train_tqdm):
                 """Data."""
                 image3D = batch['image3D'].to(mc.device)
@@ -96,22 +96,19 @@ def train():
                 """tqdm postfix."""
                 train_tqdm.set_description(f'epoch {epoch} training')
                 train_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
-                loss_history.append(np.array(loss_survivals.detach().cpu()))
+                loss_train_history.append(np.array(loss_survivals.detach().cpu()))
 
-            loss_history = np.array(loss_history)
-            summary_writer_train.add_scalar('Epoch MSE Loss', loss_history.mean(axis=0), epoch)
+            loss_train_history = np.array(loss_train_history)
+            loss_train_history_mean = loss_train_history.mean(axis=0)
+            summary_writer_train.add_scalar('Epoch MSE Loss', loss_train_history_mean, epoch)
 
             lr_scheduler_model.step()
-
-            """Save model."""
-            if ((epoch - mc.epoch_start - 19) % 20 == 0) or (epoch == mc.epoch_end - 1):
-                torch.save(model.state_dict(), f'./model/model_epoch_{epoch + 1}.pth')
 
             """Validate."""
             with torch.no_grad():
                 model.eval()
                 validate_tqdm = tqdm(validate_loader)
-                loss_history = []
+                loss_eval_history = []
                 for i, batch in enumerate(validate_tqdm):
                     """Data."""
                     image3D = batch['image3D'].to(mc.device)
@@ -127,10 +124,18 @@ def train():
 
                     validate_tqdm.set_description(f'epoch {epoch} validating')
                     validate_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
-                    loss_history.append(np.array(loss_survivals.detach().cpu()))
+                    loss_eval_history.append(np.array(loss_survivals.detach().cpu()))
 
-                loss_history = np.array(loss_history)
-                summary_writer_eval.add_scalar('Epoch MSE Loss', loss_history.mean(axis=0), epoch)
+                loss_eval_history = np.array(loss_eval_history)
+                loss_eval_history_mean = loss_eval_history.mean(axis=0)
+                summary_writer_eval.add_scalar('Epoch MSE Loss', loss_eval_history_mean, epoch)
+
+                """Save model."""
+                if epoch == mc.epoch_end - 1:
+                    torch.save(model.state_dict(), f'./model/model_epoch_{epoch + 1}.pth')
+                elif (epoch >= mc.epoch_interval * (mc.k - 1)) and (loss_eval_history_mean < mc.min_loss):
+                    mc.min_loss = loss_eval_history_mean
+                    torch.save(model.state_dict(), f'./model/model_epoch_{epoch + 1}.pth')
 
 
 if __name__ == '__main__':

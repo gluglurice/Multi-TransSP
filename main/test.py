@@ -16,8 +16,8 @@ from tqdm import tqdm
 from tensorboardX import SummaryWriter
 
 from myDataset import MyDataset
-from model import Model
-import mainConfig as mc
+from main.model import Model
+import main.mainConfig as mc
 
 
 def test():
@@ -35,7 +35,8 @@ def test():
 
     """(2) Prepare Network."""
     """Model."""
-    model = Model(max_valid_slice_num, is_position=mc.is_position).to(mc.device)
+    model = Model(max_valid_slice_num, is_text=mc.is_text, is_position=mc.is_position,
+                  is_fastformer=mc.is_fastformer).to(mc.device)
 
     if len(glob.glob(mc.model_path_reg)) > 0:
         model_path = sorted(glob.glob(mc.model_path_reg),

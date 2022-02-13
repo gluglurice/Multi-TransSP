@@ -32,14 +32,19 @@ model_path_reg = './model/model_epoch_*.pth'
 is_text = True
 is_position = True
 is_fastformer = True
-batch_size = 1
-size = 332
-lr = 0.002
-epoch_start = 0
-epoch_interval = 20
-epoch_end = epoch_start + epoch_interval
-epoch_total = 100
-epoch_decay = 80
+
 sequence_length = 256
 text_len = 12
 survivals_len = 4
+
+batch_size = 1
+size = 332
+lr = 0.002
+
+epoch_start = 0
+epoch_interval = 20
+epoch_end = epoch_start + epoch_interval
+epoch_total = epoch_interval * k
+epoch_decay = 80
+
+min_loss = 1e10

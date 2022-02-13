@@ -6,10 +6,10 @@ Author: Han
 import torch
 from torch import nn
 
-from resNetEncoder import ResNetEncoder
-from textEncoder import TextEncoder
-from fastformer import Fastformer
-import mainConfig as mc
+from main.resNetEncoder import ResNetEncoder
+from main.textEncoder import TextEncoder
+from main.fastformer import Fastformer
+import main.mainConfig as mc
 
 
 class Model(nn.Module):
