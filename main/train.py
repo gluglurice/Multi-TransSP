@@ -126,7 +126,7 @@ def train():
                     if len(glob.glob(mc.model_path_reg)) > 0:
                         model_path = sorted(glob.glob(mc.model_path_reg),
                                             key=lambda name: int(name.split('_')[-3]))[-1]
-                        if int(model_path.split('_')[-3]) == ki+1:
+                        if (os.path.exists(model_path)) and (int(model_path.split('_')[-3]) == ki+1):
                             os.remove(model_path)
                     """Save the model that has had the min loss so far."""
                     torch.save(model.state_dict(), f'{mc.model_path}/fold_{ki+1}_epoch_{epoch}.pth')
