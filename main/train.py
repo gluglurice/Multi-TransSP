@@ -88,7 +88,7 @@ def train():
             loss_train_history = np.array(loss_train_history)
             loss_train_history_mean = loss_train_history.mean(axis=0)
 
-            summary_writer_train.add_scalar('Epoch MSE Loss', loss_train_history_mean, epoch)
+            summary_writer_train.add_scalar('Epoch MSE Loss', loss_train_history_mean, epoch+1)
 
             lr_scheduler_model.step()
 
@@ -117,21 +117,21 @@ def train():
                 loss_eval_history = np.array(loss_eval_history)
                 loss_eval_history_mean = loss_eval_history.mean(axis=0)
 
-                summary_writer_eval.add_scalar('Epoch MSE Loss', loss_eval_history_mean, epoch)
+                summary_writer_eval.add_scalar('Epoch MSE Loss', loss_eval_history_mean, epoch+1)
 
                 """Save model."""
-                if loss_eval_history_mean < mc.min_loss:
-                    mc.min_loss = loss_eval_history_mean
-                    """Remove former models."""
-                    if len(glob.glob(mc.model_path_reg)) > 0:
-                        model_path = sorted(glob.glob(mc.model_path_reg),
-                                            key=lambda name: int(name.split('_')[-3]))[-1]
-                        if (os.path.exists(model_path)) and (int(model_path.split('_')[-3]) == ki+1):
-                            os.remove(model_path)
-                    """Save the model that has had the min loss so far."""
-                    if not os.path.exists(mc.model_path):
-                        os.makedirs(mc.model_path)
-                    torch.save(model.state_dict(), f'{mc.model_path}/fold_{ki+1}_epoch_{epoch+1}.pth')
+                # if loss_eval_history_mean < mc.min_loss:
+                #     mc.min_loss = loss_eval_history_mean
+                #     """Remove former models."""
+                #     if len(glob.glob(mc.model_path_reg)) > 0:
+                #         model_path = sorted(glob.glob(mc.model_path_reg),
+                #                             key=lambda name: int(name.split('_')[-3]))[-1]
+                #         if (os.path.exists(model_path)) and (int(model_path.split('_')[-3]) == ki+1):
+                #             os.remove(model_path)
+                #     """Save the model that has had the min loss so far."""
+                #     if not os.path.exists(mc.model_path):
+                #         os.makedirs(mc.model_path)
+                #     torch.save(model.state_dict(), f'{mc.model_path}/fold_{ki+1}_epoch_{epoch+1}.pth')
                 if epoch == mc.epoch_end - 1:
                     """Reset min_loss for the next fold."""
                     mc.min_loss = 1e10

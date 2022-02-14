@@ -83,10 +83,10 @@ def test():
 
                 test_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
 
-                label_survivals_array = np.array(label_survivals.squeeze())
-                predicted_survivals_array = np.array(predicted_survivals.squeeze())
-                loss_survivals_array = np.array(loss_survivals)
-                cos_similarity_array = np.array(cos_similarity)
+                label_survivals_array = np.array(label_survivals.squeeze().detach().cpu())
+                predicted_survivals_array = np.array(predicted_survivals.squeeze().detach().cpu())
+                loss_survivals_array = np.array(loss_survivals.detach().cpu())
+                cos_similarity_array = np.array(cos_similarity.detach().cpu())
 
                 # summary_writer_test.add_scalar('MSE Loss', loss_survivals_array, i)
                 # summary_writer_test.add_scalar('Cos Similarity', cos_similarity_array, i)
@@ -107,9 +107,9 @@ def test():
             test_cos_similarity_history.append(cos_similarity_history_array_mean)
             test_c_index_history.append(c_index)
 
-            summary_writer_test.add_scalar('Test MSE Loss', loss_history_array_mean, ki)
-            summary_writer_test.add_scalar('Test Cos Similarity', cos_similarity_history_array_mean, ki)
-            summary_writer_test.add_scalar('Test C Index', c_index, ki)
+            summary_writer_test.add_scalar('Test MSE Loss', loss_history_array_mean, ki+1)
+            summary_writer_test.add_scalar('Test Cos Similarity', cos_similarity_history_array_mean, ki+1)
+            summary_writer_test.add_scalar('Test C Index', c_index, ki+1)
 
     summary_writer_test.add_scalar('KFolds Mean MSE Loss', np.array(test_loss_history).mean())
     summary_writer_test.add_scalar('KFolds Std MSE Loss', np.array(test_loss_history).std())
