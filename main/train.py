@@ -28,8 +28,8 @@ def train():
 
     for ki in range(mc.k_start, mc.k):
 
-        summary_writer_train = SummaryWriter(mc.summary_path + f'/train{ki}')
-        summary_writer_eval = SummaryWriter(mc.summary_path + f'/eval{ki}')
+        summary_writer_train = SummaryWriter(mc.summary_path + f'/train_fold_{ki+1}')
+        summary_writer_eval = SummaryWriter(mc.summary_path + f'/eval_fold_{ki+1}')
 
         """(1) Prepare data."""
         train_set = MyDataset(root=mc.data_path, excel_path=mc.excel_path, mode='train',
