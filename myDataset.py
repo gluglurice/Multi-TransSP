@@ -25,7 +25,7 @@ class MyDataset(Dataset):
         Initialize the class.
         :param root: mha data root
         :param excel_path: path of the excel containing text features
-        :param mode: "train", "validate", or "test"
+        :param mode: "train", "validate", "train_all", or "test"
         :param ki: the iter number of KFold, ranging from [0, k-1]
         :param k: the total number of KFold, usually is 5, but never 0
                Especially, when ki==k==1, "validate" list will be None.
@@ -79,9 +79,11 @@ class MyDataset(Dataset):
 
     def get_mha_list(self):
         """
-        Get an mha list according to mode. When mode is "train" or "validate",
+        Get an mha list according to mode.
+        When mode is "train" or "validate",
         this function returns an mha list which is K-folded guided by ki and k.
-        And when mode is "test", it returns test mha list.
+        When mode is "train_all", it returns train mha list.
+        When mode is "test", it returns test mha list.
         :return:
             mha_list: an mha list
         """
@@ -103,6 +105,8 @@ class MyDataset(Dataset):
         elif self.mode == 'validate':
             mha_list = mha_train_list[every_fold_len * self.ki:
                                       every_fold_len * (self.ki + 1)]
+        elif self.mode == 'train_all':
+            mha_list = mha_train_list
         elif self.mode == 'test':
             mha_list = mha_test_list
 
