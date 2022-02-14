@@ -1,6 +1,6 @@
 """
 This file aims to
-test the model for predicting survival.
+test the Yap model for predicting survival.
 
 Author: Han
 """
