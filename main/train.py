@@ -62,7 +62,7 @@ def train():
 
             """Train."""
             model.train()
-            train_tqdm = tqdm(train_loader, desc=f'Fold {ki + 1}, epoch {epoch}, Train', colour='f14461')
+            train_tqdm = tqdm(train_loader, desc=f'Fold {ki + 1}, epoch {epoch}, Train', colour=0xf14461)
             loss_train_history = []
             for i, batch in enumerate(train_tqdm):
                 """Data."""
@@ -95,7 +95,7 @@ def train():
             """Eval."""
             with torch.no_grad():
                 model.eval()
-                validate_tqdm = tqdm(validate_loader, desc=f'Fold {ki + 1}, epoch {epoch}, Eval', colour='4286e7')
+                validate_tqdm = tqdm(validate_loader, desc=f'Fold {ki + 1}, epoch {epoch}, Eval', colour=0x4286e7)
                 loss_eval_history = []
                 for i, batch in enumerate(validate_tqdm):
                     """Data."""

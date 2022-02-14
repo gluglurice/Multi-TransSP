@@ -39,9 +39,9 @@ lr = 0.002
 
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")
 epoch_description = f'{date_time}_lr={lr}' \
-                    f'{"_wo-position" if not is_position else None}' \
-                    f'{"_wo-text" if not is_text else None}' \
-                    f'{"_wo-fastformer" if not is_fastformer else None}'
+                    f'{"_wo-position" if not is_position else ""}' \
+                    f'{"_wo-text" if not is_text else ""}' \
+                    f'{"_wo-fastformer" if not is_fastformer else ""}'
 model_resnet50_path = './model/resnet50-19c8e357.pth'
 model_path = f'./model/model_{epoch_description}'
 model_path_reg = f'./model/model_{epoch_description}/fold*_epoch*.pth'
