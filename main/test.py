@@ -25,9 +25,18 @@ def test():
     if not os.path.exists(mc.summary_path):
         os.makedirs(mc.summary_path)
 
-    for ki in range(mc.k_start, mc.k):
+    model_paths = []
+    if len(glob.glob(mc.test_model_path_reg)) > 0:
+        model_paths = sorted(glob.glob(mc.test_model_path_reg),
+                             key=lambda name: int(name.split('_')[-3]))
 
-        summary_writer_test = SummaryWriter(mc.summary_path + f'/test_fold_{ki+1}')
+    summary_writer_test = SummaryWriter(mc.summary_path + '/test')
+
+    test_loss_history = []
+    test_cos_similarity_history = []
+    test_c_index_history = []
+
+    for ki in range(mc.k_start, mc.k):
 
         """(1) Prepare data."""
         test_set = MyDataset(root=mc.data_path, excel_path=mc.excel_path, mode='test',
@@ -42,10 +51,8 @@ def test():
         model = Model(max_valid_slice_num, is_text=mc.is_text, is_position=mc.is_position,
                       is_fastformer=mc.is_fastformer).to(mc.device)
 
-        if len(glob.glob(mc.model_path_reg)) > 0:
-            model_path = sorted(glob.glob(mc.model_path_reg),
-                                key=lambda name: int(name.split('_')[-1].split('.')[0]))[-1]
-            model.load_state_dict(torch.load(model_path, map_location=mc.device))
+        if len(model_paths) > 0:
+            model.load_state_dict(torch.load(model_paths[ki], map_location=mc.device))
 
         """Loss."""
         criterion_MSE = nn.MSELoss()
@@ -53,7 +60,7 @@ def test():
         """(3) Start testing."""
         with torch.no_grad():
             model.eval()
-            test_tqdm = tqdm(test_loader)
+            test_tqdm = tqdm(test_loader, desc=f'Fold {ki + 1}, Test', colour='#27ce82')
 
             label_survivals_history = []
             predicted_survivals_history = []
@@ -81,22 +88,35 @@ def test():
                 loss_survivals_array = np.array(loss_survivals)
                 cos_similarity_array = np.array(cos_similarity)
 
-                summary_writer_test.add_scalar('MSE Loss', loss_survivals_array, i)
-                summary_writer_test.add_scalar('Cos Similarity', cos_similarity_array, i)
+                # summary_writer_test.add_scalar('MSE Loss', loss_survivals_array, i)
+                # summary_writer_test.add_scalar('Cos Similarity', cos_similarity_array, i)
 
                 label_survivals_history.append(label_survivals_array)
                 predicted_survivals_history.append(predicted_survivals_array)
                 loss_history.append(loss_survivals_array)
                 cos_similarity_history.append(cos_similarity_array)
 
-            summary_writer_test.add_scalar('Mean MSE Loss', np.array(loss_history).mean(axis=0))
-            summary_writer_test.add_scalar('Mean Cos Similarity', np.array(cos_similarity_history).mean(axis=0))
-
             c_index = np.array([concordance_index(
                 np.array(label_survivals_history)[:, i],
                 np.array(predicted_survivals_history)[:, i]) for i in range(4)]).mean(axis=0)
 
-            summary_writer_test.add_scalar('Mean C Index', c_index)
+            loss_history_array_mean = np.array(loss_history).mean(axis=0)
+            cos_similarity_history_array_mean = np.array(cos_similarity_history).mean(axis=0)
+
+            test_loss_history.append(loss_history_array_mean)
+            test_cos_similarity_history.append(cos_similarity_history_array_mean)
+            test_c_index_history.append(c_index)
+
+            summary_writer_test.add_scalar('Test MSE Loss', loss_history_array_mean, ki)
+            summary_writer_test.add_scalar('Test Cos Similarity', cos_similarity_history_array_mean, ki)
+            summary_writer_test.add_scalar('Test C Index', c_index, ki)
+
+    summary_writer_test.add_scalar('KFolds Mean MSE Loss', np.array(test_loss_history).mean())
+    summary_writer_test.add_scalar('KFolds Std MSE Loss', np.array(test_loss_history).std())
+    summary_writer_test.add_scalar('KFolds Mean Cos Similarity', np.array(test_cos_similarity_history).mean())
+    summary_writer_test.add_scalar('KFolds Std Cos Similarity', np.array(test_cos_similarity_history).std())
+    summary_writer_test.add_scalar('KFolds Mean C Index', np.array(c_index).mean())
+    summary_writer_test.add_scalar('KFolds Std C Index', np.array(c_index).std())
 
 
 if __name__ == '__main__':

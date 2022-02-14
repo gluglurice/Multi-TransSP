@@ -46,6 +46,7 @@ model_resnet50_path = './model/resnet50-19c8e357.pth'
 model_path = f'./model/model_{epoch_description}'
 model_path_reg = f'./model/model_{epoch_description}/fold_*_epoch_*.pth'
 summary_path = f'./summary_{epoch_description}'
+test_model_path_reg = f'./model/model_20220212105551_lr=0.002/*'
 
 sequence_length = 256
 text_len = 12
