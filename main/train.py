@@ -62,7 +62,7 @@ def train():
 
             """Train."""
             model.train()
-            train_tqdm = tqdm(train_loader, desc=f'Fold {ki + 1}, epoch {epoch}, Train', colour=0xf14461)
+            train_tqdm = tqdm(train_loader, desc=f'Fold {ki + 1}, epoch {epoch}, Train', colour='#f14461')
             loss_train_history = []
             for i, batch in enumerate(train_tqdm):
                 """Data."""
@@ -95,7 +95,7 @@ def train():
             """Eval."""
             with torch.no_grad():
                 model.eval()
-                validate_tqdm = tqdm(validate_loader, desc=f'Fold {ki + 1}, epoch {epoch}, Eval', colour=0x4286e7)
+                validate_tqdm = tqdm(validate_loader, desc=f'Fold {ki + 1}, epoch {epoch}, Eval', colour='#4286e7')
                 loss_eval_history = []
                 for i, batch in enumerate(validate_tqdm):
                     """Data."""
@@ -124,13 +124,12 @@ def train():
                     mc.min_loss = loss_eval_history_mean
                     """Remove former models."""
                     if len(glob.glob(mc.model_path_reg)) > 0:
-                        model_paths = sorted(glob.glob(mc.model_path_reg),
-                                             key=lambda name: int(name.split('_')[-1].split('.')[0]))
-                        for model_path in model_paths:
-                            if os.path.exists(model_path):
-                                os.remove(model_path)
+                        model_path = sorted(glob.glob(mc.model_path_reg),
+                                            key=lambda name: int(name.split('_')[-3]))[-1]
+                        if int(model_path.split('_')[-3]) == ki+1:
+                            os.remove(model_path)
                     """Save the model that has had the min loss so far."""
-                    torch.save(model.state_dict(), f'{mc.model_path}/fold{ki}_epoch{epoch}.pth')
+                    torch.save(model.state_dict(), f'{mc.model_path}/fold_{ki+1}_epoch_{epoch}.pth')
                 if epoch == mc.epoch_end - 1:
                     """Reset min_loss for the next fold."""
                     mc.min_loss = 1e10
