@@ -38,7 +38,7 @@ class ResNetEncoder(nn.Module):
         x = self.model.layer3(x)
         x = self.model.layer4(x)
 
-        x = self.model.avgpool(x)
+        x = self.model.avgpool(x).squeeze(-1).squeeze(-1)
 
         return x
 

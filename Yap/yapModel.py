@@ -6,7 +6,7 @@ Author: Han
 import torch
 from torch import nn
 
-from main.resNetEncoder import ResNetEncoder
+from Yap.resNetEncoder import ResNetEncoder
 from main.textEncoder import TextEncoder
 import Yap.mainConfig as mc
 
