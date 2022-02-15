@@ -1,5 +1,5 @@
 """
-Model class for predicting survivals.
+YapModel class for predicting survivals.
 
 Author: Han
 """

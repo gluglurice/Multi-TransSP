@@ -47,7 +47,7 @@ def test():
         max_valid_slice_num = test_set.max_valid_slice_num
 
         """(2) Prepare Network."""
-        """Model."""
+        """YapModel."""
         model = Model(max_valid_slice_num, is_text=mc.is_text, is_position=mc.is_position,
                       is_fastformer=mc.is_fastformer).to(mc.device)
 
@@ -87,9 +87,6 @@ def test():
                 predicted_survivals_array = np.array(predicted_survivals.squeeze().detach().cpu())
                 loss_survivals_array = np.array(loss_survivals.detach().cpu())
                 cos_similarity_array = np.array(cos_similarity.detach().cpu())
-
-                # summary_writer_test.add_scalar('MSE Loss', loss_survivals_array, i)
-                # summary_writer_test.add_scalar('Cos Similarity', cos_similarity_array, i)
 
                 label_survivals_history.append(label_survivals_array)
                 predicted_survivals_history.append(predicted_survivals_array)

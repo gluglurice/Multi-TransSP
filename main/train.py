@@ -45,7 +45,7 @@ def train():
         max_valid_slice_num = train_set.max_valid_slice_num
 
         """(2) Prepare Network."""
-        """Model."""
+        """YapModel."""
         model = Model(max_valid_slice_num, is_text=mc.is_text, is_position=mc.is_position,
                       is_fastformer=mc.is_fastformer).to(mc.device)
 

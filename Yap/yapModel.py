@@ -1,5 +1,5 @@
 """
-Model class of Yap's for predicting survivals.
+YapModel class of Yap's for predicting survivals.
 
 Author: Han
 """
@@ -11,7 +11,7 @@ from main.textEncoder import TextEncoder
 import Yap.mainConfig as mc
 
 
-class Model(nn.Module):
+class YapModel(nn.Module):
     """
     The whole model.
     """
@@ -21,11 +21,19 @@ class Model(nn.Module):
         :param max_valid_slice_num: max_valid_slice_num in dataset
         :param is_text: whether or not add text vector
         """
-        super(Model, self).__init__()
+        super(YapModel, self).__init__()
         self.max_valid_slice_num = max_valid_slice_num
         self.is_text = is_text
         self.image_encoder = ResNetEncoder()
         self.text_encoder = TextEncoder()
+
+        self.feature_channel = self.get_channel_num()
+        self.MLP = nn.Sequential(
+            nn.Linear(self.feature_channel, 1024),
+            nn.Linear(1024, 1024),
+            nn.Linear(1024, 1),
+            nn.ReLU()
+        )
 
         self.fc_survivals = nn.Linear(max_valid_slice_num, mc.survivals_len)
         self.sigmoid = nn.Sigmoid()
@@ -56,8 +64,7 @@ class Model(nn.Module):
                     x_list.append(text_feature)
 
                 x = torch.cat(x_list, dim=1)
-                x = self.fc(x)
-                x = self.sigmoid(x)
+                x = self.MLP(x)
                 survival_list.append(x)
 
             """Supplement zeros to adapt to max_valid_slice_num, and return the 4 survivals."""
@@ -68,9 +75,22 @@ class Model(nn.Module):
             survivals = self.sigmoid(survivals)
             return survivals
 
+    def get_channel_num(self):
+        """Get conv_1_1_channel and the dimension of the convolved feature map."""
+        with torch.no_grad():
+            resnet_encoder = self.image_encoder.to(mc.device)
+            image = torch.rand(1, 1, 332, 332, dtype=torch.float32).to(mc.device)
+            image_feature = resnet_encoder(image)
+
+            feature_channel = image_feature.shape[1]
+            if self.is_text:
+                feature_channel += mc.text_len
+
+            return feature_channel
+
 
 if __name__ == '__main__':
-    model = Model(85)
+    model = YapModel(85)
     image3D = torch.rand(1, 2, 332, 332, dtype=torch.float32)
     text = torch.rand(1, 12, dtype=torch.float32)
     mask = torch.ones([1, 256]).bool()

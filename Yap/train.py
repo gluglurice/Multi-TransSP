@@ -15,9 +15,8 @@ from tqdm import tqdm
 from tensorboardX import SummaryWriter
 
 from myDataset import MyDataset
-from Yap.model import Model
+from Yap.yapModel import YapModel
 import Yap.mainConfig as mc
-from utils import LambdaLR
 
 
 def train():
@@ -45,8 +44,8 @@ def train():
         max_valid_slice_num = train_set.max_valid_slice_num
 
         """(2) Prepare Network."""
-        """Model."""
-        model = Model(max_valid_slice_num, is_text=mc.is_text).to(mc.device)
+        """YapModel."""
+        model = YapModel(max_valid_slice_num, is_text=mc.is_text).to(mc.device)
 
         """Loss & Optimize."""
         criterion_MSE = nn.MSELoss()
@@ -65,10 +64,9 @@ def train():
                 image3D = batch['image3D'].to(mc.device)
                 text = batch['text'].to(mc.device)
                 label_survivals = batch['survivals'].to(mc.device)
-                mask = torch.ones([1, mc.sequence_length]).bool().to(mc.device)
 
                 """Predict."""
-                predicted_survivals = model(image3D=image3D, text=text, mask=mask).to(mc.device)
+                predicted_survivals = model(image3D=image3D, text=text).to(mc.device)
 
                 """Loss & Optimize."""
                 loss_survivals = criterion_MSE(predicted_survivals, label_survivals).to(mc.device)
@@ -96,10 +94,9 @@ def train():
                     image3D = batch['image3D'].to(mc.device)
                     text = batch['text'].to(mc.device)
                     label_survivals = batch['survivals'].to(mc.device)
-                    mask = torch.ones([1, mc.sequence_length]).bool().to(mc.device)
 
                     """Predict."""
-                    predicted_survivals = model(image3D=image3D, text=text, mask=mask).to(mc.device)
+                    predicted_survivals = model(image3D=image3D, text=text).to(mc.device)
 
                     """Loss & Optimize."""
                     loss_survivals = criterion_MSE(predicted_survivals, label_survivals).to(mc.device)
@@ -114,18 +111,6 @@ def train():
                 summary_writer_eval.add_scalar('Epoch MSE Loss', loss_eval_history_mean, epoch)
 
                 """Save model."""
-                if loss_eval_history_mean < mc.min_loss:
-                    mc.min_loss = loss_eval_history_mean
-                    """Remove former models."""
-                    if len(glob.glob(mc.model_path_reg)) > 0:
-                        model_path = sorted(glob.glob(mc.model_path_reg),
-                                            key=lambda name: int(name.split('_')[-3]))[-1]
-                        if (os.path.exists(model_path)) and (int(model_path.split('_')[-3]) == ki+1):
-                            os.remove(model_path)
-                    """Save the model that has had the min loss so far."""
-                    if not os.path.exists(mc.model_path):
-                        os.makedirs(mc.model_path)
-                    torch.save(model.state_dict(), f'{mc.model_path}/fold_{ki+1}_epoch_{epoch+1}.pth')
                 if epoch == mc.epoch_end - 1:
                     """Reset min_loss for the next fold."""
                     mc.min_loss = 1e10

@@ -50,7 +50,7 @@ text_len = 12
 survivals_len = 4
 
 epoch_start = 0
-epoch_end = 25
-epoch_decay = 15
+epoch_end = 10
+epoch_decay = 5
 
 min_loss = 1e10

@@ -16,7 +16,7 @@ from tensorboardX import SummaryWriter
 from lifelines.utils import concordance_index
 
 from myDataset import MyDataset
-from Yap.model import Model
+from Yap.yapModel import YapModel
 import Yap.mainConfig as mc
 
 
@@ -47,9 +47,8 @@ def test():
         max_valid_slice_num = test_set.max_valid_slice_num
 
         """(2) Prepare Network."""
-        """Model."""
-        model = Model(max_valid_slice_num, is_text=mc.is_text, is_position=mc.is_position,
-                      is_fastformer=mc.is_fastformer).to(mc.device)
+        """YapModel."""
+        model = YapModel(max_valid_slice_num, is_text=mc.is_text).to(mc.device)
 
         if len(model_paths) > 0:
             model.load_state_dict(torch.load(model_paths[ki], map_location=mc.device))
@@ -72,10 +71,9 @@ def test():
                 image3D = batch['image3D'].to(mc.device)
                 text = batch['text'].to(mc.device)
                 label_survivals = batch['survivals'].to(mc.device)
-                mask = torch.ones([1, mc.sequence_length]).bool().to(mc.device)
 
                 """Predict."""
-                predicted_survivals = model(image3D=image3D, text=text, mask=mask).to(mc.device)
+                predicted_survivals = model(image3D=image3D, text=text).to(mc.device)
 
                 """Loss."""
                 loss_survivals = criterion_MSE(predicted_survivals, label_survivals)
@@ -87,9 +85,6 @@ def test():
                 predicted_survivals_array = np.array(predicted_survivals.squeeze())
                 loss_survivals_array = np.array(loss_survivals)
                 cos_similarity_array = np.array(cos_similarity)
-
-                # summary_writer_test.add_scalar('MSE Loss', loss_survivals_array, i)
-                # summary_writer_test.add_scalar('Cos Similarity', cos_similarity_array, i)
 
                 label_survivals_history.append(label_survivals_array)
                 predicted_survivals_history.append(predicted_survivals_array)
