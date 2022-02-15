@@ -39,7 +39,7 @@ weight_decay = 1e-6
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")
 epoch_description = f'{date_time}_lr={lr}' \
                     f'{"_wo-text" if not is_text else ""}'
-model_resnet50_path = './model/resnet50-19c8e357.pth'
+model_resnet50_path = '../pretrainedModel/resnet50-19c8e357.pth'
 model_path = f'./model/model_{epoch_description}'
 model_path_reg = f'./model/model_{epoch_description}/fold_*_epoch_*.pth'
 summary_path = f'./summary_{epoch_description}'
