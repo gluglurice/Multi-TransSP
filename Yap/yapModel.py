@@ -46,7 +46,6 @@ class YapModel(nn.Module):
         """
         survival_list = []
         if image3D is not None:
-            text_feature = None
             """For each image piece of this patient."""
             for i, image in enumerate(image3D[0]):
                 x_list = []
@@ -55,13 +54,8 @@ class YapModel(nn.Module):
                 image_feature = self.image_encoder(image)
                 x_list.append(image_feature)
 
-                if text is not None and text_feature is None:
-                    """3D expand text feature"""
-                    text_feature = self.text_encoder(text).unsqueeze(-1).unsqueeze(-1)
-                    text_feature = text_feature.expand(text.shape[0], text.shape[1],
-                                                       image_feature.shape[-2], image_feature.shape[-1])
-                if text_feature is not None:
-                    x_list.append(text_feature)
+                if text is not None:
+                    x_list.append(text)
 
                 x = torch.cat(x_list, dim=1)
                 x = self.MLP(x)
