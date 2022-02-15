@@ -46,16 +46,12 @@ def train():
 
         """(2) Prepare Network."""
         """Model."""
-        model = Model(max_valid_slice_num, is_text=mc.is_text, is_position=mc.is_position,
-                      is_fastformer=mc.is_fastformer).to(mc.device)
+        model = Model(max_valid_slice_num, is_text=mc.is_text).to(mc.device)
 
         """Loss & Optimize."""
         criterion_MSE = nn.MSELoss()
 
-        opt_model = torch.optim.Adam(model.parameters(), lr=mc.lr, betas=(0.9, 0.9999))
-
-        lr_scheduler_model = torch.optim.lr_scheduler.LambdaLR(
-            opt_model, lr_lambda=LambdaLR(mc.epoch_end, mc.epoch_start, mc.epoch_decay).step)
+        opt_model = torch.optim.SGD(model.parameters(), lr=mc.lr, momentum=0.9, weight_decay=mc.weight_decay)
 
         """(3) Start training."""
         for epoch in range(mc.epoch_start, mc.epoch_end):
@@ -89,8 +85,6 @@ def train():
             loss_train_history_mean = loss_train_history.mean(axis=0)
 
             summary_writer_train.add_scalar('Epoch MSE Loss', loss_train_history_mean, epoch)
-
-            lr_scheduler_model.step()
 
             """Eval."""
             with torch.no_grad():

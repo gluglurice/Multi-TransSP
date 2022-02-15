@@ -31,17 +31,14 @@ text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd 
 
 """(2) Network"""
 is_text = True
-is_position = True
-is_fastformer = True
 batch_size = 1
 size = 332
-lr = 0.002
+lr = 1e-3
+weight_decay = 1e-6
 
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")
 epoch_description = f'{date_time}_lr={lr}' \
-                    f'{"_wo-position" if not is_position else ""}' \
-                    f'{"_wo-text" if not is_text else ""}' \
-                    f'{"_wo-fastformer" if not is_fastformer else ""}'
+                    f'{"_wo-text" if not is_text else ""}'
 model_resnet50_path = './model/resnet50-19c8e357.pth'
 model_path = f'./model/model_{epoch_description}'
 model_path_reg = f'./model/model_{epoch_description}/fold_*_epoch_*.pth'
