@@ -82,7 +82,7 @@ def train():
         loss_train_history = np.array(loss_train_history)
         loss_train_history_mean = loss_train_history.mean(axis=0)
 
-        summary_writer_train.add_scalar('Epoch MSE Loss', loss_train_history_mean, epoch + 1)
+        summary_writer_train.add_scalar('MSE Loss', loss_train_history_mean, epoch + 1)
 
         """Test."""
         with torch.no_grad():
@@ -126,9 +126,9 @@ def train():
             loss_test_history_mean = np.array(loss_test_history).mean(axis=0)
             cos_similarity_history_mean = np.array(cos_similarity_history).mean(axis=0)
 
-            summary_writer_test.add_scalar('MSE Loss', loss_test_history_mean)
-            summary_writer_test.add_scalar('Cos Similarity', cos_similarity_history_mean)
-            summary_writer_test.add_scalar('C Index', c_index)
+            summary_writer_test.add_scalar('MSE Loss', loss_test_history_mean, epoch + 1)
+            summary_writer_test.add_scalar('Cos Similarity', cos_similarity_history_mean, epoch + 1)
+            summary_writer_test.add_scalar('C Index', c_index, epoch + 1)
 
             """Save model."""
             if loss_test_history_mean < mc.min_loss:
@@ -148,7 +148,7 @@ def train():
                 mc.min_loss = 1e10
                 if not os.path.exists(mc.model_path):
                     os.makedirs(mc.model_path)
-                torch.save(model.state_dict(), f'{mc.model_path}/fold_{ki + 1}_epoch_{epoch + 1}.pth')
+                torch.save(model.state_dict(), f'{mc.model_path}/epoch_{epoch + 1}.pth')
 
 
 if __name__ == '__main__':
