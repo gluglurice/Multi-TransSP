@@ -61,7 +61,7 @@ class FastAttention(nn.Module):
         self.max_seq_len = max_seq_len
 
         # if using relative positional encoding,
-        # make sure to reduce pairs of consecutive feature dimension before doing projection to attention logits
+        # make sure to reduce pairs of consecutive feature num_patches before doing projection to attention logits
 
         kv_attn_proj_divisor = 1 if not exists(pos_emb) else 2
 
@@ -104,7 +104,7 @@ class FastAttention(nn.Module):
         # bias keys with global query token
         k = k * global_q
 
-        # if using rotary embeddings, do an inner product between adjacent pairs in the feature dimension
+        # if using rotary embeddings, do an inner product between adjacent pairs in the feature num_patches
         if use_rotary_emb:
             k = reduce(k, 'b h n (d r) -> b h n d', 'sum', r=2)
 
@@ -120,7 +120,7 @@ class FastAttention(nn.Module):
         # bias the values
         u = v_aggr * global_k
 
-        # if using rotary embeddings, do an inner product between adjacent pairs in the feature dimension
+        # if using rotary embeddings, do an inner product between adjacent pairs in the feature num_patches
         if use_rotary_emb:
             u = reduce(u, 'b h n (d r) -> b h n d', 'sum', r=2)
 
@@ -158,7 +158,7 @@ class Fastformer(nn.Module):
 
         layer_pos_emb = None
         if not absolute_pos_emb:
-            assert (dim_head % 4) == 0, 'dimension of the head must be divisible by 4 to use rotary embeddings'
+            assert (dim_head % 4) == 0, 'num_patches of the head must be divisible by 4 to use rotary embeddings'
             layer_pos_emb = RotaryEmbedding(dim_head // 2)
 
         # layers
@@ -205,8 +205,8 @@ class Fastformer(nn.Module):
 if __name__ == "__main__":
     model = Fastformer(num_tokens=256, dim=121, depth=2, max_seq_len=256, absolute_pos_emb=False)
 
-    a = torch.rand(1, 256, 121, dtype=torch.float32)
+    a = torch.ones(1, 256, 121, dtype=torch.float32)
     mask = torch.ones([1, 256]).bool()
 
     a = model(a, mask=mask)
-    print(a.shape)
+    print(a)

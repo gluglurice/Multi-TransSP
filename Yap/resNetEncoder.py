@@ -22,7 +22,7 @@ class ResNetEncoder(nn.Module):
         """Load pretrained resnet50."""
         self.model = models.resnet50(pretrained=False)
         if len(glob.glob(mc.model_path_reg)) == 0:
-            self.model.load_state_dict(torch.load(mc.model_resnet50_path, map_location=mc.device))
+            self.model.load_state_dict(torch.load(mc.model_resnet_path, map_location=mc.device))
 
         """Modify conv1."""
         self.model.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)

@@ -14,17 +14,17 @@ import main.mainConfig as mc
 
 class ResNetEncoder(nn.Module):
     """
-    ResNet50 from pytorch official.
+    ResNet from pytorch official.
     """
     def __init__(self):
         super(ResNetEncoder, self).__init__()
 
-        """Load pretrained resnet50."""
-        self.model = models.resnet50(pretrained=False)
+        """Load pretrained resnet."""
+        self.model = models.resnet18(pretrained=False)
         if len(glob.glob(mc.model_path_reg)) == 0:
-            self.model.load_state_dict(torch.load(mc.model_resnet50_path, map_location=mc.device))
+            self.model.load_state_dict(torch.load(mc.model_resnet_path, map_location=mc.device))
 
-        """Modify conv1."""
+        """Modify conv1 input channel from 3 to 1."""
         self.model.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
 
     def forward(self, x):
@@ -42,7 +42,8 @@ class ResNetEncoder(nn.Module):
 
 
 if __name__ == '__main__':
+    # print(ResNetEncoder())
     resnet_encoder = ResNetEncoder().to(mc.device)
-    image = torch.rand(1, 1, 332, 332, dtype=torch.float32).to(mc.device)
+    image = torch.rand(1, 1, mc.size, mc.size, dtype=torch.float32).to(mc.device)
     image_feature = resnet_encoder(image)
     print(image_feature.shape)

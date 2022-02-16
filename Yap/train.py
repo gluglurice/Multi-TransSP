@@ -82,7 +82,7 @@ def train():
             loss_train_history = np.array(loss_train_history)
             loss_train_history_mean = loss_train_history.mean(axis=0)
 
-            summary_writer_train.add_scalar('Epoch MSE Loss', loss_train_history_mean, epoch)
+            summary_writer_train.add_scalar('Epoch MSE Loss', loss_train_history_mean, epoch+1)
 
             """Eval."""
             with torch.no_grad():
@@ -108,7 +108,7 @@ def train():
                 loss_eval_history = np.array(loss_eval_history)
                 loss_eval_history_mean = loss_eval_history.mean(axis=0)
 
-                summary_writer_eval.add_scalar('Epoch MSE Loss', loss_eval_history_mean, epoch)
+                summary_writer_eval.add_scalar('Epoch MSE Loss', loss_eval_history_mean, epoch+1)
 
                 """Save model."""
                 if loss_eval_history_mean < mc.min_loss:

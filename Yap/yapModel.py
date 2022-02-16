@@ -70,7 +70,7 @@ class YapModel(nn.Module):
             return survivals
 
     def get_channel_num(self):
-        """Get conv_1_1_channel and the dimension of the convolved feature map."""
+        """Get fusion_feature_channel and the num_patches of the convolved feature map."""
         with torch.no_grad():
             resnet_encoder = self.image_encoder.to(mc.device)
             image = torch.rand(1, 1, 332, 332, dtype=torch.float32).to(mc.device)

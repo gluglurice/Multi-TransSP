@@ -3,8 +3,6 @@ Some variables
 
 Author: Han
 """
-import time
-
 from PIL import Image
 
 from torch import device, cuda
@@ -21,7 +19,7 @@ col_valid_layer = column_index_from_string('F')
 col_feature_start = column_index_from_string('I')
 col_feature_end = column_index_from_string('T')
 col_label_start = column_index_from_string('U')
-col_label_end = column_index_from_string('X')
+col_label_end = column_index_from_string('U')
 
 """Reading files."""
 input_path = './dataset/dicom'
@@ -30,10 +28,12 @@ data_path = './dataset/mha'
 mha_files_path = '/*-cropped.mha'
 
 """Dataset"""
+
+size = 332
 device = device('cuda' if cuda.is_available() else 'cpu')
 transforms_train = transforms.Compose([
-    transforms.Resize(int(332 * 1.12), Image.BICUBIC),
-    transforms.RandomCrop(332),
+    transforms.Resize(int(size * 1.12), Image.BICUBIC),
+    transforms.RandomCrop(size),
     transforms.RandomHorizontalFlip(),
     transforms.Normalize((0.5,), (0.5,))
 ])

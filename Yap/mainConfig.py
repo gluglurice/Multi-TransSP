@@ -12,12 +12,13 @@ from torchvision import transforms
 
 
 """(1) Dataloader"""
+size = 332
 excel_path = '../dataset/clinical.xlsx'
 data_path = '../dataset/mha'
 device = device('cuda' if cuda.is_available() else 'cpu')
 transforms_train = transforms.Compose([
-    transforms.Resize(int(332 * 1.12), Image.BICUBIC),
-    transforms.RandomCrop(332),
+    transforms.Resize(int(size * 1.12), Image.BICUBIC),
+    transforms.RandomCrop(size),
     transforms.RandomHorizontalFlip(),
     transforms.Normalize((0.5,), (0.5,))
 ])
@@ -27,12 +28,11 @@ transforms_test = transforms.Compose([
 k_start = 0             # KFold start ki
 k = 5                   # KFold k
 num_workers = 1         # num_workers of data loader
-text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd dimension as its length
+text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd num_patches as its length
 
 """(2) Network"""
 is_text = True
 batch_size = 1
-size = 332
 lr = 1e-3
 weight_decay = 1e-6
 
