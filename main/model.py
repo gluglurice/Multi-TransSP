@@ -31,6 +31,7 @@ class Model(nn.Module):
         self.is_fastformer = is_fastformer
         self.image_encoder = ResNetEncoder()
         self.text_encoder = TextEncoder()
+        self.avgpool = nn.AdaptiveAvgPool2d(output_size=(1, 1))
         self.dimension, self.conv_1_1_channel = self.get_channel_num()
         if is_fastformer:
             self.conv_1_1 = nn.Conv2d(self.conv_1_1_channel, mc.sequence_length,
@@ -40,7 +41,6 @@ class Model(nn.Module):
                                          depth=2, max_seq_len=256, absolute_pos_emb=True)
             self.fc_fastformer = nn.Linear(mc.sequence_length, 1)
         else:
-            self.avgpool = nn.AdaptiveAvgPool2d(output_size=(1, 1))
             self.fc = nn.Linear(self.conv_1_1_channel, 1)
         self.fc_survivals = nn.Linear(max_valid_slice_num, mc.survivals_len)
         self.sigmoid = nn.Sigmoid()
@@ -61,16 +61,17 @@ class Model(nn.Module):
 
                 image = image.unsqueeze(0).unsqueeze(0)
                 image_feature = self.image_encoder(image)
+                if not self.is_fastformer:
+                    image_feature = self.avgpool(image_feature)
                 x_list.append(image_feature)
 
-                if self.is_text:
-                    if text_feature is None:
+                if self.is_text and text_feature is None:
                         """3D expand text feature"""
                         text_feature = self.text_encoder(text).unsqueeze(-1).unsqueeze(-1)
                         text_feature = text_feature.expand(text.shape[0], text.shape[1],
                                                            image_feature.shape[-2], image_feature.shape[-1])
-                    else:
-                        x_list.append(text_feature)
+                if text_feature is not None:
+                    x_list.append(text_feature)
 
                 if self.is_position:
                     position = [0] * self.max_valid_slice_num
@@ -89,8 +90,7 @@ class Model(nn.Module):
                     x = self.fastformer(x, mask=mask).squeeze(-1)
                     x = self.fc_fastformer(x)
                 else:
-                    x = self.avgpool(x).squeeze(-1).squeeze(-1)
-                    x = self.fc(x)
+                    x = self.fc(x.squeeze(-1).squeeze(-1))
                 x = self.sigmoid(x)
                 survival_list.append(x)
 
@@ -108,6 +108,8 @@ class Model(nn.Module):
             resnet_encoder = self.image_encoder.to(mc.device)
             image = torch.rand(1, 1, 332, 332, dtype=torch.float32).to(mc.device)
             image_feature = resnet_encoder(image)
+            if not self.is_fastformer:
+                image_feature = self.avgpool(image_feature)
 
             dimension = image_feature.shape[2] * image_feature.shape[3]
 
