@@ -35,14 +35,13 @@ class Model(nn.Module):
         if is_fastformer:
             self.conv_1_1 = nn.Conv2d(self.conv_1_1_channel, mc.sequence_length,
                                       kernel_size=(1, 1), stride=(1, 1), padding=(0, 0))
+            self.flatten = nn.Flatten(start_dim=2, end_dim=-1)
             self.fastformer = Fastformer(num_tokens=mc.sequence_length, dim=self.dimension,
                                          depth=2, max_seq_len=256, absolute_pos_emb=True)
             self.fc_fastformer = nn.Linear(mc.sequence_length, 1)
         else:
-            self.conv_1_1 = nn.Conv2d(self.conv_1_1_channel, 1,
-                                      kernel_size=(1, 1), stride=(1, 1), padding=(0, 0))
-            self.fc = nn.Linear(self.dimension, 1)
-        self.flatten = nn.Flatten(start_dim=2, end_dim=-1)
+            self.avgpool = nn.AdaptiveAvgPool2d(output_size=(1, 1))
+            self.fc = nn.Linear(self.conv_1_1_channel, 1)
         self.fc_survivals = nn.Linear(max_valid_slice_num, mc.survivals_len)
         self.sigmoid = nn.Sigmoid()
 
@@ -83,12 +82,13 @@ class Model(nn.Module):
                     x_list.append(position_feature)
 
                 x = torch.cat(x_list, dim=1)
-                x = self.conv_1_1(x)
-                x = self.flatten(x)
                 if self.is_fastformer:
+                    x = self.conv_1_1(x)
+                    x = self.flatten(x)
                     x = self.fastformer(x, mask=mask).squeeze(-1)
                     x = self.fc_fastformer(x)
                 else:
+                    x = self.avgpool(x).squeeze(-1).squeeze(-1)
                     x = self.fc(x)
                 x = self.sigmoid(x)
                 survival_list.append(x)
