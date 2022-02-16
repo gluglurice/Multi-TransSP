@@ -87,7 +87,7 @@ def train():
         """Test."""
         with torch.no_grad():
             model.eval()
-            test_tqdm = tqdm(test_loader, desc=f'Test', colour='#27ce82')
+            test_tqdm = tqdm(test_loader, desc=f'Epoch {epoch}, Test', colour='#27ce82')
 
             label_survivals_history = []
             predicted_survivals_history = []

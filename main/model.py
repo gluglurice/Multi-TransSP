@@ -87,10 +87,10 @@ class Model(nn.Module):
                 survival_list.append(x)
 
             """Supplement zeros to adapt to max_valid_slice_num, and return the 4 survivals."""
-            zeros = torch.zeros([self.max_valid_slice_num - len(survival_list)],
+            zeros = torch.zeros([1, self.max_valid_slice_num - len(survival_list)],
                                 dtype=torch.float32).to(mc.device)
             survival_list.append(zeros)
-            survivals = torch.cat(survival_list, 0)
+            survivals = torch.cat(survival_list, 1)
             survivals = self.fc_survival(survivals)
             survivals = self.sigmoid(survivals)
             return survivals
