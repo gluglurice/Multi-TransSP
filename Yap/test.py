@@ -81,10 +81,10 @@ def test():
 
                 test_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
 
-                label_survivals_array = np.array(label_survivals.squeeze())
-                predicted_survivals_array = np.array(predicted_survivals.squeeze())
-                loss_survivals_array = np.array(loss_survivals)
-                cos_similarity_array = np.array(cos_similarity)
+                label_survivals_array = np.array(label_survivals.squeeze().detach().cpu())
+                predicted_survivals_array = np.array(predicted_survivals.squeeze().detach().cpu())
+                loss_survivals_array = np.array(loss_survivals.detach().cpu())
+                cos_similarity_array = np.array(cos_similarity.detach().cpu())
 
                 label_survivals_history.append(label_survivals_array)
                 predicted_survivals_history.append(predicted_survivals_array)
