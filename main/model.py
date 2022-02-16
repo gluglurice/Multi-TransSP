@@ -63,13 +63,14 @@ class Model(nn.Module):
                 image_feature = self.image_encoder(image)
                 x_list.append(image_feature)
 
-                if text is not None and text_feature is None:
-                    """3D expand text feature"""
-                    text_feature = self.text_encoder(text).unsqueeze(-1).unsqueeze(-1)
-                    text_feature = text_feature.expand(text.shape[0], text.shape[1],
-                                                       image_feature.shape[-2], image_feature.shape[-1])
-                if text_feature is not None:
-                    x_list.append(text_feature)
+                if self.is_text:
+                    if text_feature is None:
+                        """3D expand text feature"""
+                        text_feature = self.text_encoder(text).unsqueeze(-1).unsqueeze(-1)
+                        text_feature = text_feature.expand(text.shape[0], text.shape[1],
+                                                           image_feature.shape[-2], image_feature.shape[-1])
+                    else:
+                        x_list.append(text_feature)
 
                 if self.is_position:
                     position = [0] * self.max_valid_slice_num
