@@ -57,7 +57,7 @@ class Model(nn.Module):
                 image = image.unsqueeze(0).unsqueeze(0)
                 image_feature = self.image_encoder(image)
                 if not self.is_transformer:
-                    image_feature = self.avgpool(image_feature)
+                    image_feature = self.image_encoder.model.avgpool(image_feature)
                 x_list.append(image_feature)
 
                 if self.is_text and text_feature is None:
