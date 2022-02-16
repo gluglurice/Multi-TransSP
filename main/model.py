@@ -82,7 +82,7 @@ class Model(nn.Module):
                 if self.is_transformer:
                     x = self.transformer_encoder(x)
                 else:
-                    x = self.fc(x.squeeze().unsqueeze(0))
+                    x = self.fc(x.squeeze(-1).squeeze(-1))
                 x = self.sigmoid(x)
                 survival_list.append(x)
 
