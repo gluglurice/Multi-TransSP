@@ -38,7 +38,7 @@ class TransformerEncoder(nn.Module):
         x = self.transformer_encoder(x)
         x = self.fc_transformer(x[0])
 
-        return x.squeeze().unsqueeze(0)
+        return x.squeeze(0).squeeze(0)
 
 
 if __name__ == '__main__':
