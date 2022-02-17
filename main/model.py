@@ -118,4 +118,4 @@ if __name__ == '__main__':
     image3D = torch.rand(1, 2, mc.size, mc.size, dtype=torch.float32)
     text = torch.rand(1, 12, dtype=torch.float32)
     predicted_survival = model(image3D=image3D, text=text)
-    print(predicted_survival)
+    print(predicted_survival.shape)
