@@ -75,7 +75,7 @@ class MyDataset(Dataset):
             survival_list.append(row[i].value)
         survivals = torch.tensor(survival_list, dtype=torch.float)
 
-        return {'mha': mha, 'image3D': image3D.squeeze(2), 'text': text, 'survivals': survivals}
+        return {'mha': mha, 'image3D': image3D.unsqueeze(2), 'text': text, 'survivals': survivals}
 
     def get_mha_list(self):
         """
