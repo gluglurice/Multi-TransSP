@@ -88,7 +88,7 @@ def test():
 
         c_index = np.array([concordance_index(
             np.array(label_survivals_history)[:, i],
-            np.array(predicted_survivals_history)[:, i]) for i in range(4)]).mean(axis=0)
+            np.array(predicted_survivals_history)[:, i]) for i in range(mc.survivals_len)]).mean(axis=0)
 
         loss_history_array_mean = np.array(loss_history).mean(axis=0)
         cos_similarity_history_array_mean = np.array(cos_similarity_history).mean(axis=0)
