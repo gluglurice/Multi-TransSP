@@ -22,7 +22,7 @@ class TransformerEncoder(nn.Module):
 
         self.patch_to_embedding = nn.Linear(fusion_feature_channel, d_model)
         self.additional_token = nn.Parameter(torch.randn(1, 1, d_model))
-        self.pos_embedding = nn.Parameter(torch.randn(batch_size, num_patches + 1, d_model))
+        self.pos_embedding = nn.Parameter(torch.randn(1, num_patches + 1, d_model))
 
         self.transformer_encoder_layer = nn.TransformerEncoderLayer(
             d_model=d_model, nhead=nhead)
@@ -34,8 +34,9 @@ class TransformerEncoder(nn.Module):
     def forward(self, x):
         x = rearrange(x, 'b c h w -> b (h w) c')
         x = self.patch_to_embedding(x)
-        additional_tokens = repeat(self.additional_token, '() n d -> b n d', b=self.batch_size)
-        x = torch.cat((additional_tokens, x), dim=1) + self.pos_embedding
+        additional_tokens = repeat(self.additional_token, '() n d -> b n d', b=x.shape[0])
+        pos_embedding = repeat(self.pos_embedding, '() n d -> b n d', b=x.shape[0])
+        x = torch.cat((additional_tokens, x), dim=1) + pos_embedding
         x = rearrange(x, 'b n d -> n b d')
         x = self.transformer_encoder(x)
         x = rearrange(x, 'n b d -> b n d')
