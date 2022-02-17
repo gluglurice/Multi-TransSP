@@ -101,7 +101,7 @@ def train():
                 label_survivals = patient_batch['survivals'].to(mc.device)
 
                 """Predict."""
-                predicted_survivals = model(image3D=image3D, text=text).to(mc.device)
+                predicted_survivals = model(image3D=image3D[0], text=text).to(mc.device)
 
                 """Loss."""
                 loss_survivals = criterion_MSE(predicted_survivals, label_survivals)
