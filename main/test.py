@@ -28,7 +28,7 @@ def test():
     model_paths = []
     if len(glob.glob(mc.model_path_reg)) > 0:
         model_paths = sorted(glob.glob(mc.model_path_reg),
-                             key=lambda name: int(name.split('.')[0].split('_')[-1]))
+                             key=lambda name: int(name.split('_')[-1].split('.')[0]))
 
     summary_writer_test = SummaryWriter(mc.summary_path + '/test')
 

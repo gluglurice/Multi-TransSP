@@ -136,7 +136,7 @@ def train():
                 """Remove former models."""
                 if len(glob.glob(mc.model_path_reg)) > 0:
                     model_path = sorted(glob.glob(mc.model_path_reg),
-                                        key=lambda name: int(name.split('.')[0].split('_')[-1]))[-1]
+                                        key=lambda name: int(name.split('_')[-1].split('.')[0]))[-1]
                     if os.path.exists(model_path):
                         os.remove(model_path)
                 """Save the model that has had the min loss so far."""
