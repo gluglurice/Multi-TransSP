@@ -57,7 +57,7 @@ def train():
 
         """Train."""
         model.train()
-        train_tqdm = tqdm(train_loader, desc=f'Epoch {epoch}, Train', colour='#f14461')
+        train_tqdm = tqdm(train_loader, desc=f'Epoch {epoch}, Train', colour=mc.color_train)
         loss_train_history = []
         for i, batch in enumerate(train_tqdm):
             """Data."""
@@ -87,7 +87,7 @@ def train():
         """Test."""
         with torch.no_grad():
             model.eval()
-            test_tqdm = tqdm(test_loader, desc=f'Epoch {epoch}, Test', colour='#27ce82')
+            test_tqdm = tqdm(test_loader, desc=f'Epoch {epoch}, Test', colour=mc.color_test)
 
             label_survivals_history = []
             predicted_survivals_history = []

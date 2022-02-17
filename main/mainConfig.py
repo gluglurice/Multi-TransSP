@@ -60,3 +60,6 @@ epoch_start = 0
 epoch_end = 100
 
 min_loss = 1e10
+
+color_train = '#f14461'
+color_test = '#27ce82'

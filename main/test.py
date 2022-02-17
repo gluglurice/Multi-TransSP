@@ -54,7 +54,7 @@ def test():
     """(3) Start testing."""
     with torch.no_grad():
         model.eval()
-        test_tqdm = tqdm(test_loader, desc=f'Test', colour='#27ce82')
+        test_tqdm = tqdm(test_loader, desc='Test', colour=mc.color_test)
 
         label_survivals_history = []
         predicted_survivals_history = []
