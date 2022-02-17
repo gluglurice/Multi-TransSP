@@ -36,7 +36,7 @@ is_position = False
 is_transformer = True
 patient_batch_size = 1
 batch_size = 16
-lr = 1e-4
+lr = 3e-4
 weight_decay = 1e-6
 
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")
