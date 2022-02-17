@@ -51,7 +51,7 @@ class MyDataset(Dataset):
         :param index: the index of the patient in mha_list
         :return:
             {
-            'image3D': image3D, (image feature, torch.Size([1, z, h, w]))
+            'image3D': image3D, (image feature, torch.Size([1, n, c, h, w]))
             'text': text, (text feature, torch.Size([1, len])
             'survivals': survivals (regression labels, torch.Size([1, len])
             }
@@ -75,7 +75,7 @@ class MyDataset(Dataset):
             survival_list.append(row[i].value)
         survivals = torch.tensor(survival_list, dtype=torch.float)
 
-        return {'mha': mha, 'image3D': image3D, 'text': text, 'survivals': survivals}
+        return {'mha': mha, 'image3D': image3D.squeeze(2), 'text': text, 'survivals': survivals}
 
     def get_mha_list(self):
         """
