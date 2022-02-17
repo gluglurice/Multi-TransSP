@@ -35,9 +35,9 @@ def train():
     test_set = MyDataset(root=mc.data_path, excel_path=mc.excel_path, mode='test',
                          ki=0, k=mc.k, transform=mc.transforms_train, rand=True)
 
-    train_loader = DataLoader(train_set, batch_size=mc.batch_size,
+    train_loader = DataLoader(train_set, batch_size=mc.patient_batch_size,
                               shuffle=True, num_workers=mc.num_workers)
-    test_loader = DataLoader(test_set, batch_size=mc.batch_size,
+    test_loader = DataLoader(test_set, batch_size=mc.patient_batch_size,
                              shuffle=True, num_workers=mc.num_workers)
 
     max_valid_slice_num = train_set.max_valid_slice_num
@@ -59,14 +59,14 @@ def train():
         model.train()
         train_tqdm = tqdm(train_loader, desc=f'Epoch {epoch}, Train', colour=mc.color_train)
         loss_train_history = []
-        for i, batch in enumerate(train_tqdm):
+        for i, patient_batch in enumerate(train_tqdm):
             """Data."""
-            image3D = batch['image3D'].to(mc.device)
-            text = batch['text'].to(mc.device)
-            label_survivals = batch['survivals'].to(mc.device)
+            image3D = patient_batch['image3D'].to(mc.device)
+            text = patient_batch['text'].to(mc.device)
+            label_survivals = patient_batch['survivals'].to(mc.device)
 
             """Predict."""
-            predicted_survivals = model(image3D=image3D, text=text).to(mc.device)
+            predicted_survivals = model(image3D=image3D[0], text=text).to(mc.device)
 
             """Loss & Optimize."""
             loss_survivals = criterion_MSE(predicted_survivals, label_survivals).to(mc.device)
@@ -94,11 +94,11 @@ def train():
             loss_test_history = []
             cos_similarity_history = []
 
-            for i, batch in enumerate(test_tqdm):
+            for i, patient_batch in enumerate(test_tqdm):
                 """Data."""
-                image3D = batch['image3D'].to(mc.device)
-                text = batch['text'].to(mc.device)
-                label_survivals = batch['survivals'].to(mc.device)
+                image3D = patient_batch['image3D'].to(mc.device)
+                text = patient_batch['text'].to(mc.device)
+                label_survivals = patient_batch['survivals'].to(mc.device)
 
                 """Predict."""
                 predicted_survivals = model(image3D=image3D, text=text).to(mc.device)

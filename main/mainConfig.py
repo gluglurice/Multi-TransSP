@@ -34,7 +34,8 @@ text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd 
 is_text = True
 is_position = False
 is_transformer = True
-batch_size = 1
+patient_batch_size = 1
+batch_size = 8
 lr = 1e-4
 weight_decay = 1e-6
 

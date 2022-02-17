@@ -3,6 +3,7 @@ Model class for predicting survivals.
 
 Author: Han
 """
+from math import ceil
 import torch
 from torch import nn
 
@@ -44,18 +45,18 @@ class Model(nn.Module):
     def forward(self, image3D=None, text=None):
         """
         For each patient, go through the whole model, and output the predicted survival.
-        :param image3D: image3D in data batch of one patient
+        :param image3D: image3D[0] in data batch of one patient
         :param text: text in data batch of one patient
         """
         survival_list = []
         if image3D is not None:
             text_feature = None
-            """For each image piece of this patient."""
-            for i, image in enumerate(image3D[0]):
+            """For each image batch of this patient."""
+            for i in range(ceil(image3D.shape[0] / mc.batch_size)):
+                image_batch = image3D[i * mc.batch_size:(i+1) * mc.batch_size]
                 x_list = []
 
-                image = image.unsqueeze(0).unsqueeze(0)
-                image_feature = self.image_encoder(image)
+                image_feature = self.image_encoder(image_batch)
                 if not self.is_transformer:
                     image_feature = self.image_encoder.model.avgpool(image_feature)
                 x_list.append(image_feature)
@@ -63,7 +64,7 @@ class Model(nn.Module):
                 if self.is_text and text_feature is None:
                         """3D expand text feature"""
                         text_feature = self.text_encoder(text).unsqueeze(-1).unsqueeze(-1)
-                        text_feature = text_feature.expand(text.shape[0], text.shape[1],
+                        text_feature = text_feature.expand(image_feature.shape[0], text.shape[1],
                                                            image_feature.shape[-2], image_feature.shape[-1])
                 if text_feature is not None:
                     x_list.append(text_feature)
@@ -86,14 +87,14 @@ class Model(nn.Module):
                 x = self.sigmoid(x)
                 survival_list.append(x)
 
-            """Supplement zeros to adapt to max_valid_slice_num, and return the 4 survivals."""
-            zeros = torch.zeros([1, self.max_valid_slice_num - len(survival_list)],
-                                dtype=torch.float32).to(mc.device)
-            survival_list.append(zeros)
-            survivals = torch.cat(survival_list, 1)
-            survivals = self.fc_survival(survivals)
-            survivals = self.sigmoid(survivals)
-            return survivals
+        """Supplement zeros to adapt to max_valid_slice_num, and return the 4 survivals."""
+        zeros = torch.zeros([self.max_valid_slice_num - image3D.shape[0], 1],
+                            dtype=torch.float32).to(mc.device)
+        survival_list.append(zeros)
+        survivals = torch.cat(survival_list, 0).permute([1, 0])
+        survivals = self.fc_survival(survivals)
+        survivals = self.sigmoid(survivals)
+        return survivals
 
     def get_channel_num(self):
         """Get fusion_feature_channel and the num_patches of the convolved feature map."""

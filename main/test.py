@@ -35,7 +35,7 @@ def test():
     """(1) Prepare data."""
     test_set = MyDataset(root=mc.data_path, excel_path=mc.excel_path, mode='test',
                          ki=0, k=mc.k, transform=mc.transforms_test, rand=True)
-    test_loader = DataLoader(test_set, batch_size=mc.batch_size,
+    test_loader = DataLoader(test_set, batch_size=mc.patient_batch_size,
                              shuffle=True, num_workers=mc.num_workers)
 
     max_valid_slice_num = test_set.max_valid_slice_num
@@ -58,7 +58,7 @@ def test():
 
         label_survivals_history = []
         predicted_survivals_history = []
-        loss_history = []
+        loss_test_history = []
         cos_similarity_history = []
 
         for i, batch in enumerate(test_tqdm):
@@ -83,18 +83,18 @@ def test():
 
             label_survivals_history.append(label_survivals_array)
             predicted_survivals_history.append(predicted_survivals_array)
-            loss_history.append(loss_survivals_array)
+            loss_test_history.append(loss_survivals_array)
             cos_similarity_history.append(cos_similarity_array)
 
         c_index = np.array([concordance_index(
             np.array(label_survivals_history)[:, i],
             np.array(predicted_survivals_history)[:, i]) for i in range(mc.survivals_len)]).mean(axis=0)
 
-        loss_history_array_mean = np.array(loss_history).mean(axis=0)
-        cos_similarity_history_array_mean = np.array(cos_similarity_history).mean(axis=0)
+        loss_test_history_mean = np.array(loss_test_history).mean(axis=0)
+        cos_similarity_history_mean = np.array(cos_similarity_history).mean(axis=0)
 
-        summary_writer_test.add_scalar('MSE Loss', loss_history_array_mean)
-        summary_writer_test.add_scalar('Cos Similarity', cos_similarity_history_array_mean)
+        summary_writer_test.add_scalar('MSE Loss', loss_test_history_mean)
+        summary_writer_test.add_scalar('Cos Similarity', cos_similarity_history_mean)
         summary_writer_test.add_scalar('C Index', c_index)
 
 
