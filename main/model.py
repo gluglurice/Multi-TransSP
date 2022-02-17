@@ -67,6 +67,8 @@ class Model(nn.Module):
                         text_feature = text_feature.expand(image_feature.shape[0], text.shape[1],
                                                            image_feature.shape[-2], image_feature.shape[-1])
                 if text_feature is not None:
+                    if image_feature.shape[0] != text_feature.shape[0]:
+                        text_feature = text_feature[:image_feature.shape[0]]
                     x_list.append(text_feature)
 
                 # if self.is_position:
