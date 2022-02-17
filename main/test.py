@@ -26,8 +26,8 @@ def test():
         os.makedirs(mc.summary_path)
 
     model_paths = []
-    if len(glob.glob(mc.test_model_path_reg)) > 0:
-        model_paths = sorted(glob.glob(mc.test_model_path_reg),
+    if len(glob.glob(mc.model_path_reg)) > 0:
+        model_paths = sorted(glob.glob(mc.model_path_reg),
                              key=lambda name: int(name.split('.')[0].split('_')[-1]))
 
     summary_writer_test = SummaryWriter(mc.summary_path + '/test')
