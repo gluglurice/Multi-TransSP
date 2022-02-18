@@ -35,7 +35,7 @@ is_text = True
 is_position = False
 is_transformer = True
 patient_batch_size = 1
-batch_size = 16
+batch_size = 64
 lr = 9e-4
 weight_decay = 1e-6
 
