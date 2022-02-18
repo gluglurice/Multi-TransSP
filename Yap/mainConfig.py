@@ -34,7 +34,7 @@ text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd 
 is_text = True
 patient_batch_size = 1
 batch_size = 64
-lr = 9e-4
+lr = 1e-3
 weight_decay = 1e-6
 
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")

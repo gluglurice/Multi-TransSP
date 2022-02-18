@@ -156,7 +156,7 @@ def train():
                 if not os.path.exists(mc.model_path):
                     os.makedirs(mc.model_path)
                 torch.save(model.state_dict(), f'{mc.model_path}/test_epoch_{epoch + 1}.pth')
-            if epoch == mc.epoch_end - 1:
+            if ((epoch-99) % 100 == 0) or (epoch == mc.epoch_end - 1):
                 # """Reset min_loss for the next fold."""
                 # mc.min_train_loss = 1e10
                 # mc.min_test_loss = 1e10
