@@ -22,9 +22,9 @@ col_label_start = column_index_from_string('U')
 col_label_end = column_index_from_string('U')
 
 """Reading files."""
-input_path = './dataset/dicom'
-input_path_g = './dataset/dicom/chen dan-0006242445'
-data_path = './dataset/mha'
+# input_path = './dataset/dicom'
+# input_path_g = './dataset/dicom/chen dan-0006242445'
+# data_path = './dataset/mha'
 mha_files_path = '/*-cropped.mha'
 
 """Dataset"""

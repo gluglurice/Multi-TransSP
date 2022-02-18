@@ -46,10 +46,12 @@ def sub_process_generate_mha(path_list, lock_path_list, lock_excel, total, p_nam
         try:
             generator = Generator(input_path_g, pc.output_path)
 
-            """Generate the mha(s) from dicoms."""
+            """Generate the mha(s)."""
             # rtStructure = generator.get_rs()
-            # # rtStructure = generator.get_rs_from_mha(output_path, 'rs+origin')
             # generator.generate_rs_and_origin_mha(rtStructure)
+            # rtStructure = generator.get_rs_from_mha(pc.output_path, pc.input_type)
+            # generator.generate_mha(rtStructure, 'rs_cropped')
+            # generator.generate_origin_mha()
 
             """Write the number of min, max and total layers into the excel."""
             # min_layer, max_layer = generator.get_min_max_layer(rtStructure)
@@ -59,10 +61,11 @@ def sub_process_generate_mha(path_list, lock_path_list, lock_excel, total, p_nam
             # lock_excel.release()
 
             """Crop the mha(s)."""
-            # image3D = generator.get_mha(pre_config.output_path, 'rs+origin')
-            # min_layer, max_layer = get_min_max_layers_from_excel(pre_config.excel_path, patient_id)
+            # image3D = generator.get_mha(pc.output_path, pc.input_type)
+            # image3D = generator.get_mha(pc.output_path)
+            # min_layer, max_layer = get_min_max_layers_from_excel(pc.excel_path, patient_id)
             # total_layer = generator.origin.length
-            # roi_square = pre_config.roi_square
+            # roi_square = pc.roi_square
             # roi_square[0] = [min_layer, max_layer]
             # image3D = np.delete(image3D, [z for z in range(0, roi_square[0][0]-1)] +
             #                     [z for z in range(roi_square[0][1], total_layer)], axis=0)
@@ -70,7 +73,7 @@ def sub_process_generate_mha(path_list, lock_path_list, lock_excel, total, p_nam
             #                     [y for y in range(roi_square[2][1], 512)], axis=1)
             # image3D = np.delete(image3D, [x for x in range(0, roi_square[1][0]-1)] +
             #                     [x for x in range(roi_square[2][0], 512)], axis=2)
-            # generator.generate_mha(image3D, 'cropped')
+            # generator.generate_mha(image3D, 'o_cropped')
 
         except Exception as e:
             logger.error(f'[{p_name}] {package_name}: {e}')
