@@ -23,14 +23,12 @@ def trial():
     # test_loader = DataLoader(test_set, batch_size=mc.patient_batch_size,
     #                          shuffle=True, num_workers=mc.num_workers)
     # batch = next(iter(test_loader))
-    # label_survivals = torch.tensor([[1, 2, 3, 4]], dtype=torch.float)
-    # predicted_survivals = torch.tensor([[0, 1, 2, 3]], dtype=torch.float)
+    label_survivals = torch.tensor([1.5], dtype=torch.float)
+    predicted_survivals = torch.tensor([0.5], dtype=torch.float)
     # criterion_MSE = nn.MSELoss()
     # loss_survivals = criterion_MSE(predicted_survivals, label_survivals)
-    # print(loss_survivals)
-    image3D = torch.ones([85, 1, 332, 332])
-    image_batch = image3D[80:11*mc.batch_size]
-    print(image_batch.shape)
+    cos_similarity = torch.cosine_similarity(predicted_survivals, label_survivals, dim=-1)
+    print(cos_similarity)
 
 
 def main():
