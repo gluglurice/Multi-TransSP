@@ -124,7 +124,7 @@ def train():
                         os.makedirs(mc.model_path)
                     torch.save(model.state_dict(), f'{mc.model_path}/fold_{ki+1}_epoch_{epoch+1}.pth')
                 if epoch == mc.epoch_end - 1:
-                    """Reset min_loss for the next fold."""
+                    """Reset min_test_loss for the next fold."""
                     mc.min_loss = 1e10
                     torch.save(model.state_dict(), f'{mc.model_path}/fold_{ki+1}_epoch_{epoch+1}.pth')
 

@@ -46,7 +46,8 @@ epoch_description = f'{date_time}_lr={lr}' \
                     f'{"_wo-transformer" if not is_transformer else ""}'
 model_resnet_path = '../pretrainedModel/resnet18-5c106cde.pth'
 model_path = f'./model/model_{epoch_description}'
-model_path_reg = f'./model/model_{epoch_description}/epoch_*.pth'
+train_min_loss_model_path_reg = f'./model/model_{epoch_description}/train_epoch_*.pth'
+test_min_loss_model_path_reg = f'./model/model_{epoch_description}/test_epoch_*.pth'
 summary_path = f'./summary_{epoch_description}'
 test_model_path_reg = f'./model/model_20220212105551_lr=0.002/*'
 
@@ -60,7 +61,8 @@ survivals_len = 1
 epoch_start = 0
 epoch_end = 1000
 
-min_loss = 1e10
+min_train_loss = 1e10
+min_test_loss = 1e10
 
 color_train = '#f14461'
 color_test = '#27ce82'
