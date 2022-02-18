@@ -3,6 +3,7 @@ YapModel class of Yap's for predicting survivals.
 
 Author: Han
 """
+from math import ceil
 import torch
 from torch import nn
 
@@ -46,28 +47,37 @@ class YapModel(nn.Module):
         """
         survival_list = []
         if image3D is not None:
-            """For each image piece of this patient."""
-            for i, image in enumerate(image3D[0]):
+            text_feature = None
+            """For each image batch of this patient."""
+            for i in range(ceil(image3D.shape[0] / mc.batch_size)):
+                image_batch = image3D[i * mc.batch_size:(i+1) * mc.batch_size]
                 x_list = []
 
-                image = image.unsqueeze(0).unsqueeze(0)
-                image_feature = self.image_encoder(image)
+                image_feature = self.image_encoder(image_batch)
                 x_list.append(image_feature)
 
-                if text is not None:
-                    x_list.append(text)
+                if self.is_text and text_feature is None:
+                        """3D expand text feature"""
+                        text_feature = self.text_encoder(text).unsqueeze(-1).unsqueeze(-1)
+                        text_feature = text_feature.expand(image_feature.shape[0], text.shape[1],
+                                                           image_feature.shape[-2], image_feature.shape[-1])
+                if text_feature is not None:
+                    if image_feature.shape[0] != text_feature.shape[0]:
+                        text_feature = text_feature[:image_feature.shape[0]]
+                    x_list.append(text_feature)
 
                 x = torch.cat(x_list, dim=1)
                 x = self.MLP(x)
                 survival_list.append(x)
 
-            """Supplement zeros to adapt to max_valid_slice_num, and return the 4 survivals."""
-            zeros = torch.zeros([1, self.max_valid_slice_num - len(survival_list)], dtype=torch.float32).to(mc.device)
-            survival_list.append(zeros)
-            survivals = torch.cat(survival_list, 1)
-            survivals = self.fc_survivals(survivals)
-            survivals = self.sigmoid(survivals)
-            return survivals
+        """Supplement zeros to adapt to max_valid_slice_num, and return the 4 survivals."""
+        zeros = torch.zeros([self.max_valid_slice_num - image3D.shape[0], 1],
+                            dtype=torch.float32).to(mc.device)
+        survival_list.append(zeros)
+        survivals = torch.cat(survival_list, 0).permute([1, 0])
+        survivals = self.fc_survival(survivals)
+        survivals = self.sigmoid(survivals)
+        return survivals
 
     def get_channel_num(self):
         """Get fusion_feature_channel and the num_patches of the convolved feature map."""

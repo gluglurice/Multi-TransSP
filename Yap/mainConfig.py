@@ -32,25 +32,29 @@ text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd 
 
 """(2) Network"""
 is_text = True
-batch_size = 1
-lr = 1e-3
+patient_batch_size = 1
+batch_size = 64
+lr = 9e-4
 weight_decay = 1e-6
 
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")
 epoch_description = f'{date_time}_lr={lr}' \
                     f'{"_wo-text" if not is_text else ""}'
-model_resnet50_path = '../pretrainedModel/resnet50-19c8e357.pth'
+model_resnet_path = '../pretrainedModel/resnet50-19c8e357.pth'
 model_path = f'./model/model_{epoch_description}'
-model_path_reg = f'./model/model_{epoch_description}/fold_*_epoch_*.pth'
+model_path_reg = f'./model/model_{epoch_description}/*epoch_*.pth'
+train_min_loss_model_path_reg = f'./model/model_{epoch_description}/train_epoch_*.pth'
+test_min_loss_model_path_reg = f'./model/model_{epoch_description}/test_epoch_*.pth'
 summary_path = f'./summary_{epoch_description}'
-test_model_path_reg = f'./model/model_20220212105551_lr=0.002/*'
 
-sequence_length = 256
 text_len = 12
-survivals_len = 4
+survivals_len = 1
 
 epoch_start = 0
-epoch_end = 10
-epoch_decay = 5
+epoch_end = 1000
 
-min_loss = 1e10
+min_train_loss = 1e10
+min_test_loss = 1e10
+
+color_train = '#f14461'
+color_test = '#27ce82'

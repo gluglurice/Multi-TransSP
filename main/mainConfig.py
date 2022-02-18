@@ -50,7 +50,6 @@ model_path_reg = f'./model/model_{epoch_description}/*epoch_*.pth'
 train_min_loss_model_path_reg = f'./model/model_{epoch_description}/train_epoch_*.pth'
 test_min_loss_model_path_reg = f'./model/model_{epoch_description}/test_epoch_*.pth'
 summary_path = f'./summary_{epoch_description}'
-test_model_path_reg = f'./model/model_20220212105551_lr=0.002/*'
 
 d_model = 512
 nhead = 8

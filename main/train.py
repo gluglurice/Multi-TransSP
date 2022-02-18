@@ -21,8 +21,6 @@ import main.mainConfig as mc
 
 
 def train():
-    """KFold training."""
-
     if not os.path.exists(mc.summary_path):
         os.makedirs(mc.summary_path)
 
