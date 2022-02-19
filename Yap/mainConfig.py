@@ -43,15 +43,16 @@ epoch_description = f'{date_time}_lr={lr}' \
 model_resnet_path = '../pretrainedModel/resnet50-19c8e357.pth'
 model_path = f'./model/model_{epoch_description}'
 model_path_reg = f'./model/model_{epoch_description}/*epoch_*.pth'
-train_min_loss_model_path_reg = f'./model/model_{epoch_description}/train_epoch_*.pth'
-test_min_loss_model_path_reg = f'./model/model_{epoch_description}/test_epoch_*.pth'
+test_min_loss_model_path_reg = f'./model/model_{epoch_description}/test_min_loss_epoch_*.pth'
 summary_path = f'./summary_{epoch_description}'
 
 text_len = 12
 survivals_len = 1
 
 epoch_start = 0
-epoch_end = 1000
+epoch_end = 300
+epoch_start_save_model = 150
+epoch_save_model_interval = 10
 
 min_train_loss = 1e10
 min_test_loss = 1e10

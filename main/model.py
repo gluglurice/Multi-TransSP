@@ -45,8 +45,8 @@ class Model(nn.Module):
     def forward(self, image3D=None, text=None):
         """
         For each patient, go through the whole model, and output the predicted survival.
-        :param image3D: image3D[0] in data batch of one patient
-        :param text: text in data batch of one patient
+        :param image3D: image3D[0] in data batch of one patient, shape of [n 1 h w]
+        :param text: text in data batch of one patient, shape of [1 length]
         """
         survival_list = []
         if image3D is not None:

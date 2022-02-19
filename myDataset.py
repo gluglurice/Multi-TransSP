@@ -120,6 +120,7 @@ class MyDataset(Dataset):
         row_list = []
         wb = load_workbook(self.excel_path)
         ws = wb[wb.sheetnames[0]]
+        """Normalize each attribute."""
         for col in ws.iter_cols(min_col=c.col_feature_start, max_col=c.col_label_end):
             col_data = []
             for i in range(1, ws.max_row):
@@ -128,6 +129,7 @@ class MyDataset(Dataset):
             max_value = max(col_data)
             for i in range(1, ws.max_row):
                 col[i].value = (col[i].value - min_value) / (max_value - min_value)
+        """Thus get the row_list of patients in self.mha_list."""
         for mha in self.mha_list:
             patient_id = int(mha.split('-')[1].split('.')[0])
             for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
