@@ -63,7 +63,7 @@ class Model(nn.Module):
 
                 if self.is_position:
                     pos_embedding = repeat(self.pos_embedding, '() c h w -> b c h w', b=image_batch.shape[0])
-                    image_batch += pos_embedding
+                    image_batch = image_batch + pos_embedding
 
                 image_feature = self.image_encoder(image_batch)
 

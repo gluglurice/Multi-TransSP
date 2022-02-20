@@ -32,7 +32,7 @@ text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd 
 
 """(2) Network"""
 is_text = True
-is_position = False
+is_position = True
 is_transformer = True
 patient_batch_size = 1
 batch_size = 64
