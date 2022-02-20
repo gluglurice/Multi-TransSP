@@ -1,5 +1,5 @@
 """
-YapModel class of Yap's for predicting survivals.
+ChauhanModel class of Yap's for predicting survivals.
 
 Author: Han
 """
@@ -7,12 +7,12 @@ from math import ceil
 import torch
 from torch import nn
 
-from Yap.resNetEncoder import ResNetEncoder
-from Yap.textEncoder import TextEncoder
-import Yap.mainConfig as mc
+from Chauhan.resNetEncoder import ResNetEncoder
+from Chauhan.textEncoder import TextEncoder
+import Chauhan.mainConfig as mc
 
 
-class YapModel(nn.Module):
+class ChauhanModel(nn.Module):
     """
     The whole model.
     """
@@ -22,7 +22,7 @@ class YapModel(nn.Module):
         :param max_valid_slice_num: max_valid_slice_num in dataset
         :param is_text: whether or not add text vector
         """
-        super(YapModel, self).__init__()
+        super(ChauhanModel, self).__init__()
         self.max_valid_slice_num = max_valid_slice_num
         self.is_text = is_text
         self.image_encoder = ResNetEncoder()
@@ -92,7 +92,7 @@ class YapModel(nn.Module):
 
 
 if __name__ == '__main__':
-    model = YapModel(85)
+    model = ChauhanModel(85)
     image3D = torch.rand(2, 1, 332, 332, dtype=torch.float32)
     text = torch.rand(1, 12, dtype=torch.float32)
     predicted_survivals = model(image3D=image3D, text=text)

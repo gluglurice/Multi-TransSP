@@ -6,6 +6,7 @@ Author: Han
 from math import ceil
 import torch
 from torch import nn
+from einops import repeat
 
 from main.resNetEncoder import ResNetEncoder
 from main.textEncoder import TextEncoder
@@ -32,7 +33,11 @@ class Model(nn.Module):
         self.is_transformer = is_transformer
         self.image_encoder = ResNetEncoder()
         self.text_encoder = TextEncoder()
-        self.num_patches, self.fusion_feature_channel = self.get_channel_num()
+        self.image_side_length, self.fusion_feature_channel = self.get_channel_num()
+        self.num_patches = self.image_side_length ** 2
+        if is_position:
+            self.pos_embedding = nn.Parameter(
+                torch.randn(1, 1, mc.size, mc.size))
         if is_transformer:
             self.transformer_encoder = TransformerEncoder(
                 d_model=mc.d_model, nhead=mc.nhead, num_layers=mc.num_layers,
@@ -56,7 +61,12 @@ class Model(nn.Module):
                 image_batch = image3D[i * mc.batch_size:(i+1) * mc.batch_size]
                 x_list = []
 
+                if self.is_position:
+                    pos_embedding = repeat(self.pos_embedding, '() c h w -> b c h w', b=image_batch.shape[0])
+                    image_batch += pos_embedding
+
                 image_feature = self.image_encoder(image_batch)
+
                 if not self.is_transformer:
                     image_feature = self.image_encoder.model.avgpool(image_feature)
                 x_list.append(image_feature)
@@ -70,16 +80,6 @@ class Model(nn.Module):
                     if image_feature.shape[0] != text_feature.shape[0]:
                         text_feature = text_feature[:image_feature.shape[0]]
                     x_list.append(text_feature)
-
-                # if self.is_position:
-                #     position = [0] * self.max_valid_slice_num
-                #     position[i] = 1
-                #     position = torch.tensor(position, dtype=torch.float).unsqueeze(0).to(mc.device)
-                #     """3D expand position feature"""
-                #     position_feature = position.unsqueeze(-1).unsqueeze(-1)
-                #     position_feature = position_feature.expand(position_feature.shape[0], position_feature.shape[1],
-                #                                                image_feature.shape[-2], image_feature.shape[-1])
-                #     x_list.append(position_feature)
 
                 x = torch.cat(x_list, dim=1)
                 if self.is_transformer:
@@ -107,18 +107,19 @@ class Model(nn.Module):
             if not self.is_transformer:
                 image_feature = self.image_encoder.model.avgpool(image_feature)
 
-            num_patches = image_feature.shape[2] * image_feature.shape[3]
+            image_side_length = image_feature.shape[2]
 
             fusion_feature_channel = image_feature.shape[1]
             if self.is_text:
                 fusion_feature_channel += mc.text_len
 
-            return num_patches, fusion_feature_channel
+            return image_side_length, fusion_feature_channel
 
 
 if __name__ == '__main__':
     model = Model(85)
-    image3D = torch.rand(1, 2, mc.size, mc.size, dtype=torch.float32)
+    image3D = torch.rand(2, 1, mc.size, mc.size, dtype=torch.float32)
     text = torch.rand(1, 12, dtype=torch.float32)
     predicted_survival = model(image3D=image3D, text=text)
     print(predicted_survival.shape)
+    print(predicted_survival)
