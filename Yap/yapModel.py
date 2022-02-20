@@ -55,15 +55,14 @@ class YapModel(nn.Module):
 
                 image_feature = self.image_encoder(image_batch)
                 x_list.append(image_feature)
-                print(image_feature.shape)
 
                 if self.is_text and text_feature is None:
                         text_feature = self.text_encoder(text)
+                        text_feature = text_feature.expand(image_feature.shape[0], text.shape[1])
                 if text_feature is not None:
                     if image_feature.shape[0] != text_feature.shape[0]:
                         text_feature = text_feature[:image_feature.shape[0]]
                     x_list.append(text_feature)
-                    print(text_feature.shape)
 
                 x = torch.cat(x_list, dim=1)
                 x = self.fc(x)
@@ -94,7 +93,7 @@ class YapModel(nn.Module):
 
 if __name__ == '__main__':
     model = YapModel(85)
-    image3D = torch.rand(1, 1, 332, 332, dtype=torch.float32)
+    image3D = torch.rand(2, 1, 332, 332, dtype=torch.float32)
     text = torch.rand(1, 12, dtype=torch.float32)
     predicted_survivals = model(image3D=image3D, text=text)
     print(predicted_survivals)
