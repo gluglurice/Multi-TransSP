@@ -29,7 +29,7 @@ class YapModel(nn.Module):
         self.text_encoder = TextEncoder()
 
         self.feature_channel = self.get_channel_num()
-        self.MLP = nn.Sequential(
+        self.fc = nn.Sequential(
             nn.Linear(self.feature_channel, 1024),
             nn.Linear(1024, 1024),
             nn.Linear(1024, 1),
@@ -67,7 +67,7 @@ class YapModel(nn.Module):
                     x_list.append(text_feature)
 
                 x = torch.cat(x_list, dim=1)
-                x = self.MLP(x)
+                x = self.fc(x)
                 survival_list.append(x)
 
         """Supplement zeros to adapt to max_valid_slice_num, and return the 4 survivals."""
