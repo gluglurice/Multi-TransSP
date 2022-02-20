@@ -133,8 +133,8 @@ def train():
 
             """Save model."""
             if epoch >= mc.epoch_start_save_model - 1:
-                if loss_train_history_mean < mc.min_train_loss:
-                    mc.min_train_loss = loss_train_history_mean
+                if loss_test_history_mean < mc.min_test_loss:
+                    mc.min_test_loss = loss_test_history_mean
                     """Remove former models."""
                     if len(glob.glob(mc.test_min_loss_model_path_reg)) > 0:
                         model_path = sorted(glob.glob(mc.test_min_loss_model_path_reg),

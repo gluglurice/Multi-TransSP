@@ -129,8 +129,8 @@ def train():
 
             """Save model."""
             if epoch >= mc.epoch_start_save_model - 1:
-                if loss_train_history_mean < mc.min_train_loss:
-                    mc.min_train_loss = loss_train_history_mean
+                if loss_test_history_mean < mc.min_test_loss:
+                    mc.min_test_loss = loss_test_history_mean
                     """Remove former models."""
                     if len(glob.glob(mc.test_min_loss_model_path_reg)) > 0:
                         model_path = sorted(glob.glob(mc.test_min_loss_model_path_reg),
@@ -141,7 +141,8 @@ def train():
                     if not os.path.exists(mc.model_path):
                         os.makedirs(mc.model_path)
                     torch.save(model.state_dict(), f'{mc.model_path}/test_min_loss_epoch_{epoch + 1}.pth')
-                if (epoch - (mc.epoch_save_model_interval - 1)) % mc.epoch_save_model_interval == 0:
+                if (epoch - (mc.epoch_start_save_model - 1) - (mc.epoch_save_model_interval - 1)) \
+                        % mc.epoch_save_model_interval == 0:
                     if not os.path.exists(mc.model_path):
                         os.makedirs(mc.model_path)
                     torch.save(model.state_dict(), f'{mc.model_path}/epoch_{epoch + 1}.pth')
