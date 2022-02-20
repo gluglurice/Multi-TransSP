@@ -55,16 +55,15 @@ class YapModel(nn.Module):
 
                 image_feature = self.image_encoder(image_batch)
                 x_list.append(image_feature)
+                print(image_feature.shape)
 
                 if self.is_text and text_feature is None:
-                        """3D expand text feature"""
-                        text_feature = self.text_encoder(text).unsqueeze(-1).unsqueeze(-1)
-                        text_feature = text_feature.expand(image_feature.shape[0], text.shape[1],
-                                                           image_feature.shape[-2], image_feature.shape[-1])
+                        text_feature = self.text_encoder(text)
                 if text_feature is not None:
                     if image_feature.shape[0] != text_feature.shape[0]:
                         text_feature = text_feature[:image_feature.shape[0]]
                     x_list.append(text_feature)
+                    print(text_feature.shape)
 
                 x = torch.cat(x_list, dim=1)
                 x = self.fc(x)
@@ -75,7 +74,7 @@ class YapModel(nn.Module):
                             dtype=torch.float32).to(mc.device)
         survival_list.append(zeros)
         survivals = torch.cat(survival_list, 0).permute([1, 0])
-        survivals = self.fc_survival(survivals)
+        survivals = self.fc_survivals(survivals)
         survivals = self.sigmoid(survivals)
         return survivals
 
@@ -95,8 +94,7 @@ class YapModel(nn.Module):
 
 if __name__ == '__main__':
     model = YapModel(85)
-    image3D = torch.rand(1, 2, 332, 332, dtype=torch.float32)
+    image3D = torch.rand(1, 1, 332, 332, dtype=torch.float32)
     text = torch.rand(1, 12, dtype=torch.float32)
-    mask = torch.ones([1, 256]).bool()
-    predicted_survivals = model(image3D=image3D, text=text, mask=mask)
+    predicted_survivals = model(image3D=image3D, text=text)
     print(predicted_survivals)
