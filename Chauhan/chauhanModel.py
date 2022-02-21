@@ -63,7 +63,7 @@ class ChauhanModel(nn.Module):
                 image_batch = image3D[i * mc.batch_size:(i + 1) * mc.batch_size]
                 image_feature = self.image_encoder(image_batch)
                 image_feature_list.append(image_feature)
-            image_feature = torch.cat(image_feature_list, dim=1)
+            image_feature = torch.cat(image_feature_list, dim=0)
             predicted_survivals_from_image = self.fc_image(image_feature)
             survivals_from_image_list.append(predicted_survivals_from_image)
 
