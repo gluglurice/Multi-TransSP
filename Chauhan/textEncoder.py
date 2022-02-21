@@ -15,10 +15,13 @@ class TextEncoder(nn.Module):
     """
     def __init__(self):
         super(TextEncoder, self).__init__()
-        self.fc = nn.Linear(mc.text_len, mc.text_len)
+        self.MLP = nn.Sequential(
+            nn.Linear(mc.text_len, 512),
+            nn.ReLU()
+        )
 
     def forward(self, x):
-        x = self.fc(x)
+        x = self.MLP(x)
         return x
 
 

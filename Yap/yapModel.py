@@ -17,14 +17,12 @@ class YapModel(nn.Module):
     The whole model.
     """
 
-    def __init__(self, max_valid_slice_num, is_text=True):
+    def __init__(self, max_valid_slice_num):
         """
         :param max_valid_slice_num: max_valid_slice_num in dataset
-        :param is_text: whether or not add text vector
         """
         super(YapModel, self).__init__()
         self.max_valid_slice_num = max_valid_slice_num
-        self.is_text = is_text
         self.image_encoder = ResNetEncoder()
         self.text_encoder = TextEncoder()
 
@@ -50,16 +48,17 @@ class YapModel(nn.Module):
             text_feature = None
             """For each image batch of this patient."""
             for i in range(ceil(image3D.shape[0] / mc.batch_size)):
-                image_batch = image3D[i * mc.batch_size:(i+1) * mc.batch_size]
+                image_batch = image3D[i * mc.batch_size:(i + 1) * mc.batch_size]
                 x_list = []
 
                 image_feature = self.image_encoder(image_batch)
                 x_list.append(image_feature)
 
-                if self.is_text and text_feature is None:
-                        text_feature = self.text_encoder(text)
-                        text_feature = text_feature.expand(image_feature.shape[0], text.shape[1])
-                if text_feature is not None:
+                if text_feature is None:
+                    text_feature = self.text_encoder(text)
+                    text_feature = text_feature.expand(image_feature.shape[0], text.shape[1])
+                    x_list.append(text_feature)
+                else:
                     if image_feature.shape[0] != text_feature.shape[0]:
                         text_feature = text_feature[:image_feature.shape[0]]
                     x_list.append(text_feature)
@@ -81,19 +80,18 @@ class YapModel(nn.Module):
         """Get fusion_feature_channel and the num_patches of the convolved feature map."""
         with torch.no_grad():
             resnet_encoder = self.image_encoder.to(mc.device)
-            image = torch.rand(1, 1, 332, 332, dtype=torch.float32).to(mc.device)
+            image = torch.rand(1, 1, mc.size, mc.size, dtype=torch.float32).to(mc.device)
             image_feature = resnet_encoder(image)
 
-            feature_channel = image_feature.shape[1]
-            if self.is_text:
-                feature_channel += mc.text_len
+            feature_channel = image_feature.shape[1] + mc.text_len
 
             return feature_channel
 
 
 if __name__ == '__main__':
     model = YapModel(85)
-    image3D = torch.rand(2, 1, 332, 332, dtype=torch.float32)
+    image3D = torch.rand(2, 1, mc.size, mc.size, dtype=torch.float32)
     text = torch.rand(1, 12, dtype=torch.float32)
     predicted_survivals = model(image3D=image3D, text=text)
+    print(predicted_survivals.shape)
     print(predicted_survivals)

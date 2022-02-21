@@ -93,7 +93,6 @@ def train():
             label_survivals_history = []
             predicted_survivals_history = []
             loss_test_history = []
-            cos_similarity_history = []
 
             for i, patient_batch in enumerate(test_tqdm):
                 """Data."""
@@ -118,17 +117,14 @@ def train():
                 label_survivals_history.append(label_survivals_array)
                 predicted_survivals_history.append(predicted_survivals_array)
                 loss_test_history.append(loss_survivals_array)
-                cos_similarity_history.append(cos_similarity_array)
 
             c_index = np.array([concordance_index(
                 np.array(label_survivals_history)[:, i],
                 np.array(predicted_survivals_history)[:, i]) for i in range(mc.survivals_len)]).mean(axis=0)
 
             loss_test_history_mean = np.array(loss_test_history).mean(axis=0)
-            cos_similarity_history_mean = np.array(cos_similarity_history).mean(axis=0)
 
             summary_writer_test.add_scalar('MSE Loss', loss_test_history_mean, epoch + 1)
-            summary_writer_test.add_scalar('Cos Similarity', cos_similarity_history_mean, epoch + 1)
             summary_writer_test.add_scalar('C Index', c_index, epoch + 1)
 
             """Save model."""

@@ -29,20 +29,20 @@ def train():
 
     """(1) Prepare data."""
     train_set = MyDataset(root=mc.data_path, excel_path=mc.excel_path, mode='train_all',
-                          ki=0, k=mc.k, transform=mc.transforms_train, rand=False)
+                          ki=0, k=mc.k, transform=mc.transforms_train, rand=True)
     test_set = MyDataset(root=mc.data_path, excel_path=mc.excel_path, mode='test',
-                         ki=0, k=mc.k, transform=mc.transforms_train, rand=False)
+                         ki=0, k=mc.k, transform=mc.transforms_train, rand=True)
 
     train_loader = DataLoader(train_set, batch_size=mc.patient_batch_size,
-                              shuffle=False, num_workers=mc.num_workers)
+                              shuffle=True, num_workers=mc.num_workers)
     test_loader = DataLoader(test_set, batch_size=mc.patient_batch_size,
-                             shuffle=False, num_workers=mc.num_workers)
+                             shuffle=True, num_workers=mc.num_workers)
 
     max_valid_slice_num = train_set.max_valid_slice_num
 
     """(2) Prepare Network."""
     """Model."""
-    model = ChauhanModel(max_valid_slice_num, is_text=mc.is_text).to(mc.device)
+    model = ChauhanModel(max_valid_slice_num).to(mc.device)
 
     """Loss & Optimize."""
     criterion_MSE = nn.MSELoss()
@@ -56,30 +56,42 @@ def train():
         model.train()
         train_tqdm = tqdm(train_loader, desc=f'Epoch {epoch}, Train', colour=mc.color_train)
         loss_train_history = []
+        former_patient_image_feature = None
+        former_patient_text_feature = None
+        former_patient_label_survivals = None
+
         for i, patient_batch in enumerate(train_tqdm):
             """Data."""
             image3D = patient_batch['image3D'].to(mc.device)
             text = patient_batch['text'].to(mc.device)
             label_survivals = patient_batch['survivals'].to(mc.device)
 
-            next_patient_batch = train_set.__getitem__((i+1) % len(train_set))
-            next_image3D = next_patient_batch['image3D'].to(mc.device)
-            next_text = next_patient_batch['text'].to(mc.device)
-            next_label_survivals = next_patient_batch['survivals'].to(mc.device)
-
             """Predict."""
-            predicted_survivals = model(image3D=image3D[0], text=text).to(mc.device)
+            image_feature, text_feature, predicted_survivals_from_image, predicted_survivals_from_text \
+                = model(image3D=image3D[0], text=text)
 
             """Loss & Optimize."""
-            loss_survivals = criterion_MSE(predicted_survivals, label_survivals).to(mc.device)
+            loss_survivals_of_image = criterion_MSE(predicted_survivals_from_image, label_survivals).to(mc.device)
+            loss_survivals_of_text = criterion_MSE(predicted_survivals_from_text, label_survivals).to(mc.device)
+            loss_similarity = 0
+            if former_patient_image_feature is not None:
+                loss_similarity = torch.dot(image_feature, former_patient_text_feature) \
+                                  + torch.dot(former_patient_image_feature, text_feature) \
+                                  - 2 * torch.dot(image_feature, text_feature) \
+                                  + 2 * max(0.5, (label_survivals - former_patient_label_survivals).abs().item())
+            loss = loss_survivals_of_image + loss_survivals_of_text + loss_similarity
 
             opt_model.zero_grad()
-            loss_survivals.backward()
+            loss.backward()
             opt_model.step()
 
-            train_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
+            train_tqdm.set_postfix(loss=f'{loss.item():.4f}')
 
-            loss_train_history.append(np.array(loss_survivals.detach().cpu()))
+            loss_train_history.append(np.array(loss.detach().cpu()))
+
+            former_patient_image_feature = image_feature
+            former_patient_text_feature = text_feature
+            former_patient_label_survivals = label_survivals
 
         loss_train_history = np.array(loss_train_history)
         loss_train_history_mean = loss_train_history.mean(axis=0)
@@ -94,7 +106,6 @@ def train():
             label_survivals_history = []
             predicted_survivals_history = []
             loss_test_history = []
-            cos_similarity_history = []
 
             for i, patient_batch in enumerate(test_tqdm):
                 """Data."""
@@ -103,33 +114,29 @@ def train():
                 label_survivals = patient_batch['survivals'].to(mc.device)
 
                 """Predict."""
-                predicted_survivals = model(image3D=image3D[0], text=text).to(mc.device)
+                image_feature, text_feature, predicted_survivals_from_image, predicted_survivals_from_text \
+                    = model(image3D=image3D[0], text=text)
 
                 """Loss."""
-                loss_survivals = criterion_MSE(predicted_survivals, label_survivals)
-                cos_similarity = torch.cosine_similarity(predicted_survivals, label_survivals, dim=-1)
+                loss_survivals_of_image = criterion_MSE(predicted_survivals_from_image, label_survivals)
 
-                test_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
+                test_tqdm.set_postfix(loss_survivals_of_image=f'{loss_survivals_of_image.item():.4f}')
 
                 label_survivals_array = np.array(label_survivals.squeeze(0).detach().cpu())
-                predicted_survivals_array = np.array(predicted_survivals.squeeze(0).detach().cpu())
-                loss_survivals_array = np.array(loss_survivals.detach().cpu())
-                cos_similarity_array = np.array(cos_similarity.detach().cpu())
+                predicted_survivals_array = np.array(predicted_survivals_from_image.squeeze(0).detach().cpu())
+                loss_survivals_array = np.array(loss_survivals_of_image.detach().cpu())
 
                 label_survivals_history.append(label_survivals_array)
                 predicted_survivals_history.append(predicted_survivals_array)
                 loss_test_history.append(loss_survivals_array)
-                cos_similarity_history.append(cos_similarity_array)
 
             c_index = np.array([concordance_index(
                 np.array(label_survivals_history)[:, i],
                 np.array(predicted_survivals_history)[:, i]) for i in range(mc.survivals_len)]).mean(axis=0)
 
             loss_test_history_mean = np.array(loss_test_history).mean(axis=0)
-            cos_similarity_history_mean = np.array(cos_similarity_history).mean(axis=0)
 
             summary_writer_test.add_scalar('MSE Loss', loss_test_history_mean, epoch + 1)
-            summary_writer_test.add_scalar('Cos Similarity', cos_similarity_history_mean, epoch + 1)
             summary_writer_test.add_scalar('C Index', c_index, epoch + 1)
 
             """Save model."""
