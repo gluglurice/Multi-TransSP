@@ -24,11 +24,10 @@ col_label_end = column_index_from_string('U')
 """Reading files."""
 # input_path = './dataset/dicom'
 # input_path_g = './dataset/dicom/chen dan-0006242445'
-# data_path = './dataset/mha'
+data_path = './dataset/mha'
 mha_files_path = '/*-cropped.mha'
 
 """Dataset"""
-
 size = 332
 device = device('cuda' if cuda.is_available() else 'cpu')
 transforms_train = transforms.Compose([
@@ -37,6 +36,8 @@ transforms_train = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.Normalize((0.5,), (0.5,))
 ])
-train_test_ratio = 5    # a number dividing the dataset by
+train_test_ratio = 100    # a number dividing the dataset by
 k = 5                   # KFold k
 seed = 2022             # seed of random.shuffle to guarantee the same dataset
+num_workers = 2
+patient_batch_size = 1

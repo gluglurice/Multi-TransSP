@@ -30,9 +30,7 @@ class ChauhanModel(nn.Module):
 
         self.feature_channel = self.get_channel_num()
         self.fc = nn.Sequential(
-            nn.Linear(self.feature_channel, 1024),
-            nn.Linear(1024, 1024),
-            nn.Linear(1024, 1),
+            nn.Linear(self.feature_channel, 1),
             nn.ReLU()
         )
 

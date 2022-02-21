@@ -29,14 +29,14 @@ def train():
 
     """(1) Prepare data."""
     train_set = MyDataset(root=mc.data_path, excel_path=mc.excel_path, mode='train_all',
-                          ki=0, k=mc.k, transform=mc.transforms_train, rand=True)
+                          ki=0, k=mc.k, transform=mc.transforms_train, rand=False)
     test_set = MyDataset(root=mc.data_path, excel_path=mc.excel_path, mode='test',
-                         ki=0, k=mc.k, transform=mc.transforms_train, rand=True)
+                         ki=0, k=mc.k, transform=mc.transforms_train, rand=False)
 
     train_loader = DataLoader(train_set, batch_size=mc.patient_batch_size,
-                              shuffle=True, num_workers=mc.num_workers)
+                              shuffle=False, num_workers=mc.num_workers)
     test_loader = DataLoader(test_set, batch_size=mc.patient_batch_size,
-                             shuffle=True, num_workers=mc.num_workers)
+                             shuffle=False, num_workers=mc.num_workers)
 
     max_valid_slice_num = train_set.max_valid_slice_num
 
@@ -61,6 +61,11 @@ def train():
             image3D = patient_batch['image3D'].to(mc.device)
             text = patient_batch['text'].to(mc.device)
             label_survivals = patient_batch['survivals'].to(mc.device)
+
+            next_patient_batch = train_set.__getitem__((i+1) % len(train_set))
+            next_image3D = next_patient_batch['image3D'].to(mc.device)
+            next_text = next_patient_batch['text'].to(mc.device)
+            next_label_survivals = next_patient_batch['survivals'].to(mc.device)
 
             """Predict."""
             predicted_survivals = model(image3D=image3D[0], text=text).to(mc.device)
@@ -141,8 +146,7 @@ def train():
                     if not os.path.exists(mc.model_path):
                         os.makedirs(mc.model_path)
                     torch.save(model.state_dict(), f'{mc.model_path}/test_min_loss_epoch_{epoch + 1}.pth')
-                if (epoch - (mc.epoch_start_save_model) - (mc.epoch_save_model_interval - 1)) \
-                        % mc.epoch_save_model_interval == 0:
+                if (epoch - (mc.epoch_save_model_interval - 1)) % mc.epoch_save_model_interval == 0:
                     if not os.path.exists(mc.model_path):
                         os.makedirs(mc.model_path)
                     torch.save(model.state_dict(), f'{mc.model_path}/epoch_{epoch + 1}.pth')

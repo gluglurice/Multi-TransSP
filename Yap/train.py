@@ -141,8 +141,7 @@ def train():
                     if not os.path.exists(mc.model_path):
                         os.makedirs(mc.model_path)
                     torch.save(model.state_dict(), f'{mc.model_path}/test_min_loss_epoch_{epoch + 1}.pth')
-                if (epoch - (mc.epoch_start_save_model) - (mc.epoch_save_model_interval - 1)) \
-                        % mc.epoch_save_model_interval == 0:
+                if (epoch - (mc.epoch_save_model_interval - 1)) % mc.epoch_save_model_interval == 0:
                     if not os.path.exists(mc.model_path):
                         os.makedirs(mc.model_path)
                     torch.save(model.state_dict(), f'{mc.model_path}/epoch_{epoch + 1}.pth')
