@@ -1,6 +1,6 @@
 """
 This file aims to
-train the model for predicting survival.
+train the MultiSurv model for predicting survival.
 
 Author: Han
 """
@@ -16,8 +16,8 @@ from tensorboardX import SummaryWriter
 from lifelines.utils import concordance_index
 
 from myDataset import MyDataset
-from main.model import Model
-import main.mainConfig as mc
+from MultiSurv.multiSurvModel import MultiSurvModel
+import MultiSurv.mainConfig as mc
 
 
 def train():
@@ -42,14 +42,12 @@ def train():
 
     """(2) Prepare Network."""
     """Model."""
-    model = Model(max_valid_slice_num, is_text=mc.is_text, is_position=mc.is_position,
-                  is_transformer=mc.is_transformer).to(mc.device)
+    model = MultiSurvModel(max_valid_slice_num).to(mc.device)
 
     """Loss & Optimize."""
     criterion_MSE = nn.MSELoss()
 
     opt_model = torch.optim.SGD(model.parameters(), lr=mc.lr, momentum=0.9, weight_decay=mc.weight_decay)
-    lr_scheduler_model = torch.optim.lr_scheduler.CosineAnnealingLR(opt_model, T_max=20, eta_min=1e-6)
 
     """(3) Start training."""
     for epoch in range(mc.epoch_start, mc.epoch_end):
@@ -83,8 +81,6 @@ def train():
 
         summary_writer_train.add_scalar('MSE Loss', loss_train_history_mean, epoch + 1)
 
-        lr_scheduler_model.step()
-
         """Test."""
         with torch.no_grad():
             model.eval()
@@ -105,12 +101,14 @@ def train():
 
                 """Loss."""
                 loss_survivals = criterion_MSE(predicted_survivals, label_survivals)
+                cos_similarity = torch.cosine_similarity(predicted_survivals, label_survivals, dim=-1)
 
                 test_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
 
                 label_survivals_array = np.array(label_survivals.squeeze(0).detach().cpu())
                 predicted_survivals_array = np.array(predicted_survivals.squeeze(0).detach().cpu())
                 loss_survivals_array = np.array(loss_survivals.detach().cpu())
+                cos_similarity_array = np.array(cos_similarity.detach().cpu())
 
                 label_survivals_history.append(label_survivals_array)
                 predicted_survivals_history.append(predicted_survivals_array)

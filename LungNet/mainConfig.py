@@ -31,28 +31,18 @@ num_workers = 2         # num_workers of data loader
 text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd num_patches as its length
 
 """(2) Network"""
-is_text = False
-is_position = False
-is_transformer = True
 patient_batch_size = 1
 batch_size = 64
 lr = 1e-3
 weight_decay = 1e-6
 
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")
-epoch_description = f'{date_time}_lr={lr}' \
-                    f'{"_wo-position" if not is_position else ""}' \
-                    f'{"_wo-text" if not is_text else ""}' \
-                    f'{"_wo-transformer" if not is_transformer else ""}'
-model_resnet_path = '../pretrainedModel/resnet18-5c106cde.pth'
+epoch_description = f'{date_time}_lr={lr}'
+model_resnet_path = '../pretrainedModel/resnet50-19c8e357.pth'
 model_path = f'./model/model_{epoch_description}'
 model_path_reg = f'./model/model_{epoch_description}/*epoch_*.pth'
 test_min_loss_model_path_reg = f'./model/model_{epoch_description}/test_min_loss_epoch_*.pth'
 summary_path = f'./summary_{epoch_description}'
-
-d_model = 512
-nhead = 8
-num_layers = 6
 
 text_len = 12
 survivals_len = 1
