@@ -32,19 +32,16 @@ text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd 
 
 """(2) Network"""
 patient_batch_size = 1
-batch_size = 64
 lr = 1e-3
 weight_decay = 1e-6
 
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")
 epoch_description = f'{date_time}_lr={lr}'
-model_resnet_path = '../pretrainedModel/resnet50-19c8e357.pth'
 model_path = f'./model/model_{epoch_description}'
 model_path_reg = f'./model/model_{epoch_description}/*epoch_*.pth'
 test_min_loss_model_path_reg = f'./model/model_{epoch_description}/test_min_loss_epoch_*.pth'
 summary_path = f'./summary_{epoch_description}'
 
-text_len = 12
 survivals_len = 1
 
 epoch_start = 0

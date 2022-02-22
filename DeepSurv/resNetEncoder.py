@@ -44,8 +44,8 @@ class ResNetEncoder(nn.Module):
 
 
 if __name__ == '__main__':
-    # print(ResNextEncoder())
-    resnet_encoder = ResNetEncoder().to(mc.device)
-    image = torch.rand(1, 1, mc.size, mc.size, dtype=torch.float32).to(mc.device)
-    image_feature = resnet_encoder(image)
-    print(image_feature.shape)
+    print(ResNetEncoder())
+    # resnet_encoder = ResNetEncoder().to(mc.device)
+    # image = torch.rand(1, 1, mc.size, mc.size, dtype=torch.float32).to(mc.device)
+    # image_feature = resnet_encoder(image)
+    # print(image_feature.shape)
