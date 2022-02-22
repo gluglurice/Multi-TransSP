@@ -76,17 +76,14 @@ def train():
             """Loss & Optimize."""
             loss_survivals_of_image = criterion_MSE(predicted_survivals_from_image, label_survivals).to(mc.device)
             loss_survivals_of_text = criterion_MSE(predicted_survivals_from_text, label_survivals).to(mc.device)
-            loss_similarity = None
+            loss_similarity = 0
             if former_patient_image_feature is not None:
                 loss_similarity = (
-                        torch.dot(image_feature, former_patient_text_feature) +
-                        torch.dot(former_patient_image_feature, text_feature) -
-                        2 * torch.dot(image_feature, text_feature) +
+                        torch.dot(image_feature.detach(), former_patient_text_feature.detach()) +
+                        torch.dot(former_patient_image_feature.detach(), text_feature.detach()) -
+                        2 * torch.dot(image_feature.detach(), text_feature.detach()) +
                         2 * max(0.5, (label_survivals - former_patient_label_survivals).abs().item())).to(mc.device)
-            if loss_similarity is not None:
-                loss = loss_survivals_of_image + loss_survivals_of_text + loss_similarity
-            else:
-                loss = loss_survivals_of_image + loss_survivals_of_text
+            loss = loss_survivals_of_image + loss_survivals_of_text + loss_similarity
 
             opt_model.zero_grad()
             loss.backward()
