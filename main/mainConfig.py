@@ -42,8 +42,9 @@ weight_decay = 1e-6
 
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")
 epoch_description = f'{date_time}_lr={lr}' \
-                    f'{"_wo-position" if not is_position else ""}' \
+                    f'{"_wo-image" if not is_image else ""}' \
                     f'{"_wo-text" if not is_text else ""}' \
+                    f'{"_wo-position" if not is_position else ""}' \
                     f'{"_wo-transformer" if not is_transformer else ""}'
 model_resnet_path = '../pretrainedModel/resnet18-5c106cde.pth'
 model_path = f'./model/model_{epoch_description}'
