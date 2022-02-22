@@ -31,7 +31,8 @@ num_workers = 2         # num_workers of data loader
 text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd num_patches as its length
 
 """(2) Network"""
-is_text = False
+is_image = False
+is_text = True
 is_position = False
 is_transformer = True
 patient_batch_size = 1

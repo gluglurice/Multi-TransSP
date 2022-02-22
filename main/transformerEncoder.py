@@ -50,8 +50,8 @@ if __name__ == '__main__':
     # print(TransformerEncoder())
     transformer_encoder = TransformerEncoder(
         d_model=mc.d_model, nhead=mc.nhead, num_layers=mc.num_layers,
-        num_patches=121, fusion_feature_channel=512).to(mc.device)
-    input_feature = torch.rand(1, 512, 11, 11, dtype=torch.float32).to(mc.device)
+        num_patches=1, fusion_feature_channel=12).to(mc.device)
+    input_feature = torch.rand(1, 12, 1, 1, dtype=torch.float32).to(mc.device)
     output_feature = transformer_encoder(input_feature)
     print(output_feature.shape)
     print(output_feature)

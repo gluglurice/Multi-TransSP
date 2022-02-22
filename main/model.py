@@ -19,7 +19,7 @@ class Model(nn.Module):
     The whole model.
     """
 
-    def __init__(self, max_valid_slice_num, is_text=True, is_position=True, is_transformer=True):
+    def __init__(self, max_valid_slice_num, is_image=True, is_text=True, is_position=True, is_transformer=True):
         """
         :param max_valid_slice_num: max_valid_slice_num in dataset
         :param is_text: whether or not add text vector
@@ -28,11 +28,14 @@ class Model(nn.Module):
         """
         super(Model, self).__init__()
         self.max_valid_slice_num = max_valid_slice_num
+        self.is_image = is_image
         self.is_text = is_text
         self.is_position = is_position
         self.is_transformer = is_transformer
-        self.image_encoder = ResNetEncoder()
-        self.text_encoder = TextEncoder()
+        if self.is_image:
+            self.image_encoder = ResNetEncoder()
+        if self.is_text:
+            self.text_encoder = TextEncoder()
         self.image_side_length, self.fusion_feature_channel = self.get_channel_num()
         self.num_patches = self.image_side_length ** 2
         if is_position:
@@ -53,8 +56,8 @@ class Model(nn.Module):
         :param image3D: image3D[0] in data batch of one patient, shape of [n 1 h w]
         :param text: text in data batch of one patient, shape of [1 length]
         """
-        survival_list = []
-        if image3D is not None:
+        if self.is_image:
+            survival_list = []
             text_feature = None
             """For each image batch of this patient."""
             for i in range(ceil(image3D.shape[0] / mc.batch_size)):
@@ -89,14 +92,26 @@ class Model(nn.Module):
                 x = self.sigmoid(x)
                 survival_list.append(x)
 
-        """Supplement zeros to adapt to max_valid_slice_num, and return the 4 survivals."""
-        zeros = torch.zeros([self.max_valid_slice_num - image3D.shape[0], 1],
-                            dtype=torch.float32).to(mc.device)
-        survival_list.append(zeros)
-        survivals = torch.cat(survival_list, 0).permute([1, 0])
-        survivals = self.fc_survival(survivals)
-        survivals = self.sigmoid(survivals)
-        return survivals
+            """Supplement zeros to adapt to max_valid_slice_num, and return the 4 survivals."""
+            zeros = torch.zeros([self.max_valid_slice_num - image3D.shape[0], 1],
+                                dtype=torch.float32).to(mc.device)
+            survival_list.append(zeros)
+            survivals = torch.cat(survival_list, 0).permute([1, 0])
+            survivals = self.fc_survival(survivals)
+            survivals = self.sigmoid(survivals)
+            return survivals
+        else:
+            if self.is_text:
+                x = self.text_encoder(text).unsqueeze(-1).unsqueeze(-1)
+                if self.is_transformer:
+                    x = self.transformer_encoder(x)
+                else:
+                    x = self.fc(x.squeeze(-1).squeeze(-1))
+                survivals = self.fc_survival(x)
+                survivals = self.sigmoid(survivals)
+                return survivals
+            else:
+                return None
 
     def get_channel_num(self):
         """Get fusion_feature_channel and the num_patches of the convolved feature map."""
