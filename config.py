@@ -36,7 +36,7 @@ transforms_train = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.Normalize((0.5,), (0.5,))
 ])
-train_test_ratio = 100    # a number dividing the dataset by
+train_test_ratio = 5    # a number dividing the dataset by
 k = 5                   # KFold k
 seed = 2022             # seed of random.shuffle to guarantee the same dataset
 num_workers = 2

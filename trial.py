@@ -24,9 +24,10 @@ def trial():
     #                          shuffle=False, num_workers=c.num_workers)
     # data = next(iter(test_loader))
     # print(data['mha'], '\n')
-    a = torch.rand([1, 1], dtype=torch.float)
-    b = torch.rand([1, 1], dtype=torch.float)
-    print(torch.dot(a, b))
+    a = torch.tensor([[0]], dtype=torch.float)
+    b = torch.tensor([[0.5]], dtype=torch.float)
+    cos_similarity = torch.cosine_similarity(a, b, dim=-1)
+    print(cos_similarity)
 
 
 def main():

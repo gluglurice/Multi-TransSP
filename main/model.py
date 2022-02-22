@@ -117,7 +117,7 @@ class Model(nn.Module):
 
 
 if __name__ == '__main__':
-    model = Model(85)
+    model = Model(85, is_text=mc.is_text, is_position=mc.is_position, is_transformer=mc.is_transformer)
     image3D = torch.rand(2, 1, mc.size, mc.size, dtype=torch.float32)
     text = torch.rand(1, 12, dtype=torch.float32)
     predicted_survival = model(image3D=image3D, text=text)

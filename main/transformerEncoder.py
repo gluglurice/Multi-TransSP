@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from einops import rearrange, repeat, reduce
 
-import mainConfig as mc
+import main.mainConfig as mc
 
 
 class TransformerEncoder(nn.Module):
@@ -15,7 +15,7 @@ class TransformerEncoder(nn.Module):
     TransformerEncoder from pytorch official.
     """
     def __init__(self, d_model=mc.d_model, nhead=mc.nhead, num_layers=mc.num_layers,
-                 batch_size=mc.batch_size, num_patches=None, fusion_feature_channel=None):
+                 batch_size=mc.batch_size, num_patches=121, fusion_feature_channel=512):
         super(TransformerEncoder, self).__init__()
 
         self.batch_size = batch_size
@@ -50,7 +50,8 @@ if __name__ == '__main__':
     # print(TransformerEncoder())
     transformer_encoder = TransformerEncoder(
         d_model=mc.d_model, nhead=mc.nhead, num_layers=mc.num_layers,
-        num_patches=121, fusion_feature_channel=524).to(mc.device)
-    input_feature = torch.rand(8, 524, 11, 11, dtype=torch.float32).to(mc.device)
+        num_patches=121, fusion_feature_channel=512).to(mc.device)
+    input_feature = torch.rand(1, 512, 11, 11, dtype=torch.float32).to(mc.device)
     output_feature = transformer_encoder(input_feature)
     print(output_feature.shape)
+    print(output_feature)
