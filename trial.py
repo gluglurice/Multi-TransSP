@@ -26,7 +26,7 @@ def trial():
     # print(data['mha'], '\n')
     a = torch.rand([1, 1], dtype=torch.float)
     b = torch.rand([1, 1], dtype=torch.float)
-    print((a-b).abs().item())
+    print(torch.dot(a, b))
 
 
 def main():

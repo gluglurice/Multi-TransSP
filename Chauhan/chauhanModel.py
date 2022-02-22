@@ -82,7 +82,7 @@ class ChauhanModel(nn.Module):
             image_encoder = self.image_encoder.to(mc.device)
             text_encoder = self.text_encoder.to(mc.device)
             image = torch.rand(1, 1, mc.size, mc.size, dtype=torch.float32).to(mc.device)
-            text = torch.rand(1, mc.text_len, dtype=torch.float32)
+            text = torch.rand(1, mc.text_len, dtype=torch.float32).to(mc.device)
             image_feature = image_encoder(image)
             text_feature = text_encoder(text)
 

@@ -12,6 +12,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from einops import reduce
 from tensorboardX import SummaryWriter
 from lifelines.utils import concordance_index
 
@@ -69,6 +70,8 @@ def train():
             """Predict."""
             image_feature, text_feature, predicted_survivals_from_image, predicted_survivals_from_text \
                 = model(image3D=image3D[0], text=text)
+            image_feature = reduce(image_feature, 'b c -> c', 'mean')
+            text_feature = reduce(text_feature, 'b c -> c', 'mean')
 
             """Loss & Optimize."""
             loss_survivals_of_image = criterion_MSE(predicted_survivals_from_image, label_survivals).to(mc.device)
