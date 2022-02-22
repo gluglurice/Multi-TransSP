@@ -38,11 +38,9 @@ def train():
     test_loader = DataLoader(test_set, batch_size=mc.patient_batch_size,
                              shuffle=True, num_workers=mc.num_workers)
 
-    max_valid_slice_num = train_set.max_valid_slice_num
-
     """(2) Prepare Network."""
     """Model."""
-    model = DeepSurvModel(max_valid_slice_num).to(mc.device)
+    model = DeepSurvModel().to(mc.device)
 
     """Loss & Optimize."""
     criterion_MSE = nn.MSELoss()
@@ -58,12 +56,11 @@ def train():
         loss_train_history = []
         for i, patient_batch in enumerate(train_tqdm):
             """Data."""
-            image3D = patient_batch['image3D'].to(mc.device)
             text = patient_batch['text'].to(mc.device)
             label_survivals = patient_batch['survivals'].to(mc.device)
 
             """Predict."""
-            predicted_survivals = model(image3D=image3D[0], text=text).to(mc.device)
+            predicted_survivals = model(text=text).to(mc.device)
 
             """Loss & Optimize."""
             loss_survivals = criterion_MSE(predicted_survivals, label_survivals).to(mc.device)
@@ -92,23 +89,20 @@ def train():
 
             for i, patient_batch in enumerate(test_tqdm):
                 """Data."""
-                image3D = patient_batch['image3D'].to(mc.device)
                 text = patient_batch['text'].to(mc.device)
                 label_survivals = patient_batch['survivals'].to(mc.device)
 
                 """Predict."""
-                predicted_survivals = model(image3D=image3D[0], text=text).to(mc.device)
+                predicted_survivals = model(text=text).to(mc.device)
 
                 """Loss."""
                 loss_survivals = criterion_MSE(predicted_survivals, label_survivals)
-                cos_similarity = torch.cosine_similarity(predicted_survivals, label_survivals, dim=-1)
 
                 test_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
 
                 label_survivals_array = np.array(label_survivals.squeeze(0).detach().cpu())
                 predicted_survivals_array = np.array(predicted_survivals.squeeze(0).detach().cpu())
                 loss_survivals_array = np.array(loss_survivals.detach().cpu())
-                cos_similarity_array = np.array(cos_similarity.detach().cpu())
 
                 label_survivals_history.append(label_survivals_array)
                 predicted_survivals_history.append(predicted_survivals_array)
