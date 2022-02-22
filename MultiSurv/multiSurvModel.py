@@ -7,7 +7,7 @@ from math import ceil
 import torch
 from torch import nn
 
-from MultiSurv.resNetEncoder import ResNetEncoder
+from MultiSurv.resNextEncoder import ResNextEncoder
 from MultiSurv.textEncoder import TextEncoder
 import MultiSurv.mainConfig as mc
 
@@ -23,14 +23,12 @@ class MultiSurvModel(nn.Module):
         """
         super(MultiSurvModel, self).__init__()
         self.max_valid_slice_num = max_valid_slice_num
-        self.image_encoder = ResNetEncoder()
-        self.text_encoder = TextEncoder()
-
+        self.image_encoder = ResNextEncoder()
         self.feature_channel = self.get_channel_num()
+        self.text_encoder = TextEncoder(text_len=mc.text_len, feature_channel=self.feature_channel)
+
         self.fc = nn.Sequential(
-            nn.Linear(self.feature_channel, 1024),
-            nn.Linear(1024, 1024),
-            nn.Linear(1024, 1),
+            nn.Linear(self.feature_channel, 1),
             nn.ReLU()
         )
 
@@ -49,21 +47,16 @@ class MultiSurvModel(nn.Module):
             """For each image batch of this patient."""
             for i in range(ceil(image3D.shape[0] / mc.batch_size)):
                 image_batch = image3D[i * mc.batch_size:(i + 1) * mc.batch_size]
-                x_list = []
 
                 image_feature = self.image_encoder(image_batch)
-                x_list.append(image_feature)
 
                 if text_feature is None:
                     text_feature = self.text_encoder(text)
-                    text_feature = text_feature.expand(image_feature.shape[0], text.shape[1])
-                    x_list.append(text_feature)
-                else:
-                    if image_feature.shape[0] != text_feature.shape[0]:
-                        text_feature = text_feature[:image_feature.shape[0]]
-                    x_list.append(text_feature)
 
-                x = torch.cat(x_list, dim=1)
+                x = torch.zeros_like(image_feature)
+                for b in range(image_feature.shape[0]):
+                    for c in range(image_feature.shape[1]):
+                        x[b][c] = max(image_feature[b][c], text_feature[0][c])
                 x = self.fc(x)
                 survival_list.append(x)
 
@@ -79,11 +72,11 @@ class MultiSurvModel(nn.Module):
     def get_channel_num(self):
         """Get fusion_feature_channel and the num_patches of the convolved feature map."""
         with torch.no_grad():
-            resnet_encoder = self.image_encoder.to(mc.device)
+            image_encoder = self.image_encoder.to(mc.device)
             image = torch.rand(1, 1, mc.size, mc.size, dtype=torch.float32).to(mc.device)
-            image_feature = resnet_encoder(image)
+            image_feature = image_encoder(image)
 
-            feature_channel = image_feature.shape[1] + mc.text_len
+            feature_channel = image_feature.shape[1]
 
             return feature_channel
 

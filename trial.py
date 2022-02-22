@@ -24,10 +24,13 @@ def trial():
     #                          shuffle=False, num_workers=c.num_workers)
     # data = next(iter(test_loader))
     # print(data['mha'], '\n')
-    a = torch.tensor([[0]], dtype=torch.float)
-    b = torch.tensor([[0.5]], dtype=torch.float)
-    cos_similarity = torch.cosine_similarity(a, b, dim=-1)
-    print(cos_similarity)
+    a = torch.tensor([[1, 2, 3, 4], [1, 2, 3, 4]], dtype=torch.float)
+    b = torch.tensor([[2, 1, 4, 3]], dtype=torch.float)
+    c = torch.zeros_like(a)
+    for i in range(len(c)):
+        for j in range(len(c[0])):
+            c[i][j] = max(a[i][j], b[0][j])
+    print(c)
 
 
 def main():

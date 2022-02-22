@@ -38,7 +38,7 @@ weight_decay = 1e-6
 
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")
 epoch_description = f'{date_time}_lr={lr}'
-model_resnet_path = '../pretrainedModel/resnet50-19c8e357.pth'
+model_resnet_path = '../pretrainedModel/resnext50_32x4d-7cdf4587.pth'
 model_path = f'./model/model_{epoch_description}'
 model_path_reg = f'./model/model_{epoch_description}/*epoch_*.pth'
 test_min_loss_model_path_reg = f'./model/model_{epoch_description}/test_min_loss_epoch_*.pth'
