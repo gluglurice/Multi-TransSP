@@ -1,5 +1,5 @@
 """
-ResNextEncoder class in the model.
+ResNetEncoder class in the model.
 
 Author: Han
 """
