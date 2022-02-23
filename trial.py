@@ -18,17 +18,17 @@ def trial():
     """
     Trial.
     """
-    test_set = MyDataset(root=c.data_path, excel_path=c.excel_path, mode='test',
-                         ki=0, k=c.k, transform=c.transforms_train, rand=True)
-    test_loader = DataLoader(test_set, batch_size=c.patient_batch_size,
-                             shuffle=True, num_workers=c.num_workers)
-    for i, batch in enumerate(test_loader):
-        print(i, len(batch))
-        break
-    # a = torch.rand([8, 1], dtype=torch.float)
-    # b = torch.rand([8, 1], dtype=torch.float)
+    # test_set = MyDataset(root=c.data_path, excel_path=c.excel_path, mode='test',
+    #                      ki=0, k=c.k, transform=c.transforms_train, rand=True)
+    # test_loader = DataLoader(test_set, batch_size=c.patient_batch_size,
+    #                          shuffle=True, num_workers=c.num_workers)
+    # for i, batch in enumerate(test_loader):
+    #     print(i, len(batch))
+    #     break
+    a = torch.rand([1, 4], dtype=torch.float)
+    b = torch.ones([1, 4], dtype=torch.float)
     # c = nn.MSELoss()(a, b)
-    # print(c)
+    print(torch.where(a > b, a, b))
 
 
 def main():

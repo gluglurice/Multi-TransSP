@@ -101,14 +101,12 @@ def train():
 
                 """Loss."""
                 loss_survivals = criterion_MSE(predicted_survivals, label_survivals)
-                cos_similarity = torch.cosine_similarity(predicted_survivals, label_survivals, dim=-1)
 
                 test_tqdm.set_postfix(loss_survivals=f'{loss_survivals.item():.4f}')
 
                 label_survivals_array = np.array(label_survivals.squeeze(0).detach().cpu())
                 predicted_survivals_array = np.array(predicted_survivals.squeeze(0).detach().cpu())
                 loss_survivals_array = np.array(loss_survivals.detach().cpu())
-                cos_similarity_array = np.array(cos_similarity.detach().cpu())
 
                 label_survivals_history.append(label_survivals_array)
                 predicted_survivals_history.append(predicted_survivals_array)

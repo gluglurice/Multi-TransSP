@@ -6,6 +6,7 @@ Author: Han
 from math import ceil
 import torch
 from torch import nn
+from einops import repeat, reduce
 
 from MultiSurv.resNextEncoder import ResNextEncoder
 from MultiSurv.textEncoder import TextEncoder
@@ -52,11 +53,12 @@ class MultiSurvModel(nn.Module):
 
                 if text_feature is None:
                     text_feature = self.text_encoder(text)
-
-                x = torch.zeros_like(image_feature)
-                for b in range(image_feature.shape[0]):
-                    for c in range(image_feature.shape[1]):
-                        x[b][c] = max(image_feature[b][c], text_feature[0][c])
+                if text_feature.shape[0] == 1:
+                    text_feature = repeat(text_feature, '() c -> b c', b=image_feature.shape[0])
+                elif text_feature.shape[0] != image_feature.shape[0]:
+                    text_feature = reduce(text_feature, 'b c -> () c', 'min')
+                    text_feature = repeat(text_feature, '() c -> b c', b=image_feature.shape[0])
+                x = torch.where(image_feature > text_feature, image_feature, text_feature)
                 x = self.fc(x)
                 survival_list.append(x)
 
