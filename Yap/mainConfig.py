@@ -33,7 +33,7 @@ text_length_dim = 2     # text is of torch.Size((1, 1, 12)) and we take the 2nd 
 """(2) Network"""
 patient_batch_size = 1
 batch_size = 64
-lr = 1e-4
+lr = 1e-2
 weight_decay = 1e-6
 
 date_time = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -48,8 +48,8 @@ text_len = 12
 survivals_len = 1
 
 epoch_start = 0
-epoch_end = 300
-epoch_start_save_model = 150
+epoch_end = 50
+epoch_start_save_model = 50
 epoch_save_model_interval = 10
 
 min_train_loss = 1e10

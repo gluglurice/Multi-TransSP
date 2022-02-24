@@ -48,7 +48,7 @@ def train():
     criterion_MSE = nn.MSELoss()
 
     opt_model = torch.optim.SGD(model.parameters(), lr=mc.lr, momentum=0.9, weight_decay=mc.weight_decay)
-    lr_scheduler_model = torch.optim.lr_scheduler.CosineAnnealingLR(opt_model, T_max=20, eta_min=1e-7)
+    lr_scheduler_model = torch.optim.lr_scheduler.CosineAnnealingLR(opt_model, T_max=20, eta_min=1e-5)
 
     """(3) Start training."""
     for epoch in range(mc.epoch_start, mc.epoch_end):
