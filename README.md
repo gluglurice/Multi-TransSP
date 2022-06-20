@@ -1,7 +1,8 @@
 # Multi-TransSP
 
 ## Introduction
-  This is the code of "Multi-TransSP: Multimodal Transformer for Survival Prediction of Nasopharyngeal Carcinoma Patients", provisionally accepted for MICCAI 2022.
+  This is the code of "Multi-TransSP: Multimodal Transformer for Survival Prediction of Nasopharyngeal Carcinoma Patients", provisionally accepted for MICCAI 2022. Considering the privacy of patients, we cannot make the in-house dataset public.
+  
   Here's the framework chart of this paper.
   ![image](https://user-images.githubusercontent.com/34258007/174515360-709a6a07-20a9-4f58-a319-ff6e0ba80a52.png)
 
